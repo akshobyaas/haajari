@@ -9,7 +9,7 @@ function apply(choice) {
   if (choice === 'system') root.removeAttribute('data-theme');
   else root.setAttribute('data-theme', choice);
   const dark = choice === 'dark' || (choice === 'system' && media.matches);
-  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#173a2e' : '#1E4A3B');
+  document.querySelector('meta[name="theme-color"]')?.setAttribute('content', dark ? '#00a9b4' : '#00bcc8');
 }
 
 export function setTheme(choice) {

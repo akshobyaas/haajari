@@ -23,8 +23,8 @@ export default defineConfig({
         short_name: 'Haajari',
         description: 'One-tap school attendance that works offline',
         lang: 'kn',
-        theme_color: '#1E4A3B',
-        background_color: '#EEF2EF',
+        theme_color: '#00bcc8',
+        background_color: '#f3f6f6',
         display: 'standalone',
         start_url: '/',
         icons: [

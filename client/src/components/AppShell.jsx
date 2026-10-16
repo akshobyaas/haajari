@@ -67,7 +67,7 @@ export default function AppShell() {
         <nav className="flex flex-col gap-1">
           {sideItems.map(({ to, icon: Icon, key, end }) => (
             <NavLink key={to} to={to} end={end}
-              className={({ isActive }) => `flex items-center gap-3 rounded-xl px-3 py-2.5 font-semibold transition ${isActive ? 'bg-chalk text-slate' : 'text-chalk/80 hover:bg-white/10'}`}>
+              className={({ isActive }) => `flex items-center gap-3 rounded-xl px-3 py-2.5 font-semibold transition ${isActive ? 'bg-accent text-on-brand' : 'text-chalk/80 hover:bg-black/10'}`}>
               <span className="relative"><Icon className="size-5" aria-hidden />{badge(key)}</span> {t(`nav.${key}`)}
             </NavLink>
           ))}

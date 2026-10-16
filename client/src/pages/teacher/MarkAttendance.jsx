@@ -237,10 +237,10 @@ function Shell({ back, title, historyTo, children }) {
     <div className="min-h-dvh bg-paper pb-36">
       <header className="chalkboard sticky top-0 z-10 px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3">
         <div className="mx-auto flex max-w-3xl items-center gap-2">
-          <Link to={back} aria-label={t('common.back')} className="-ml-2 rounded-full p-2 hover:bg-white/10"><ArrowLeft className="size-6" /></Link>
+          <Link to={back} aria-label={t('common.back')} className="-ml-2 rounded-full p-2 hover:bg-black/10"><ArrowLeft className="size-6" /></Link>
           <h1 className="flex-1 truncate text-2xl font-bold">{title || t('mark.title')}</h1>
           {historyTo && (
-            <Link to={historyTo} className="inline-flex items-center gap-1 rounded-full bg-white/10 px-3 py-1.5 text-[15px] font-semibold hover:bg-white/20">
+            <Link to={historyTo} className="inline-flex items-center gap-1 rounded-full bg-accent px-3 py-1.5 text-[15px] font-semibold text-on-brand hover:brightness-95">
               <History className="size-4" /> {t('mark.history')}
             </Link>
           )}
@@ -326,11 +326,11 @@ function DoneOverlay({ done, classId, go }) {
           <div className="mt-8 flex w-full max-w-xs flex-col gap-3">
             {next && (
               <button onClick={() => go(`/t/class/${next._id}/mark`)}
-                className="min-h-14 rounded-xl bg-chalk text-lg font-semibold text-slate">
+                className="min-h-14 rounded-xl bg-accent text-lg font-semibold text-on-brand">
                 {t('mark.nextClass', { name: classLabel(next) })}
               </button>
             )}
-            <button onClick={() => go('/t')} className={`min-h-14 rounded-xl text-lg font-semibold ${next ? 'border border-chalk/40 text-chalk' : 'bg-chalk text-slate'}`}>
+            <button onClick={() => go('/t')} className={`min-h-14 rounded-xl text-lg font-semibold ${next ? 'border-2 border-on-brand/40 text-on-brand' : 'bg-accent text-on-brand'}`}>
               {t('mark.done')}
             </button>
           </div>

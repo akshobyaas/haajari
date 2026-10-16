@@ -25,7 +25,7 @@ export default function PassSheet({ open, onClose, student }) {
     let alive = true;
     setImg('');
     api.get(`/me/children/${student._id}/pickup-pass`, { params: { guardianId } })
-      .then(({ data }) => QRCode.toDataURL(data.qr, { width: 640, margin: 1, errorCorrectionLevel: 'M', color: { dark: '#13261e', light: '#ffffff' } }))
+      .then(({ data }) => QRCode.toDataURL(data.qr, { width: 640, margin: 1, errorCorrectionLevel: 'M', color: { dark: '#101414', light: '#ffffff' } }))
       .then((url) => alive && setImg(url))
       .catch((e) => alive && setError(errorMessage(e)));
     return () => { alive = false; };

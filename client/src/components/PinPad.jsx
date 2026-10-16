@@ -64,7 +64,7 @@ function Key({ children, quiet, ...props }) {
       whileTap={{ scale: 0.92 }}
       {...props}
       className={`flex h-16 items-center justify-center rounded-2xl text-[26px] font-semibold transition-colors disabled:opacity-40 ${
-        quiet ? 'text-muted hover:bg-line/40' : 'bg-card text-ink shadow-lift hover:bg-chalk'
+        quiet ? 'text-muted hover:bg-line/40' : 'bg-card text-ink shadow-lift hover:bg-line/40'
       }`}
     >
       {children}

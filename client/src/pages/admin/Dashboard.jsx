@@ -58,11 +58,11 @@ export default function Dashboard() {
                 <p className="mt-1 text-xl">{t('dash.inSchool')}</p>
                 <p className="text-chalk/75">{d.totals.marked ? t('dash.ofStudents', { total: d.totals.students, pct: d.totals.pct }) : t('dash.noneMarked')}</p>
               </div>
-              <Link to="/a/in-school" className="inline-flex min-h-12 items-center justify-between gap-2 self-start rounded-xl bg-chalk px-4 font-semibold text-slate">
+              <Link to="/a/in-school" className="inline-flex min-h-12 items-center justify-between gap-2 self-start rounded-xl bg-accent px-4 font-semibold text-on-brand">
                 <Siren className="size-5" /> {t('dash.drillBtn')} <ChevronRight className="size-4" />
               </Link>
             </>
-          ) : <Skeleton className="h-40 bg-white/10" />}
+          ) : <Skeleton className="h-40 bg-black/10" />}
         </Card>
         <Card className="p-5">
           {d ? (

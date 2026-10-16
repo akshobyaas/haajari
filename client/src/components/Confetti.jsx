@@ -14,7 +14,7 @@ export default function Confetti({ fire }) {
     canvas.width = innerWidth * dpr;
     canvas.height = innerHeight * dpr;
     ctx.scale(dpr, dpr);
-    const colors = ['#f4f7f2', '#e2a12b', '#4fbf83', '#85a4ee', '#ef6b5f'];
+    const colors = ['#d0ff00', '#ffffff', '#101414', '#d0ff00', '#ffffff'];
     const bits = Array.from({ length: 90 }, () => ({
       x: innerWidth / 2 + (Math.random() - 0.5) * 80,
       y: innerHeight * 0.32,

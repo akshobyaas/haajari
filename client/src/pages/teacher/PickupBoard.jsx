@@ -225,10 +225,10 @@ function Shell({ title, onScan, children }) {
     <div className="min-h-dvh bg-paper pb-36">
       <header className="chalkboard sticky top-0 z-10 px-4 pt-[max(0.75rem,env(safe-area-inset-top))] pb-3">
         <div className="mx-auto flex max-w-3xl items-center gap-2">
-          <Link to="/t" aria-label={t('common.back')} className="-ml-2 rounded-full p-2 hover:bg-white/10"><ArrowLeft className="size-6" /></Link>
+          <Link to="/t" aria-label={t('common.back')} className="-ml-2 rounded-full p-2 hover:bg-black/10"><ArrowLeft className="size-6" /></Link>
           <h1 className="flex-1 truncate text-2xl font-bold">{title || t('pickup.title')}</h1>
           {onScan && (
-            <button onClick={onScan} className="inline-flex items-center gap-1 rounded-full bg-chalk px-3 py-1.5 font-semibold text-slate">
+            <button onClick={onScan} className="inline-flex items-center gap-1 rounded-full bg-accent px-3 py-1.5 font-semibold text-on-brand">
               <ScanLine className="size-4" /> {t('pickup.scan')}
             </button>
           )}

@@ -2,29 +2,32 @@
 @import '@fontsource-variable/baloo-tamma-2';
 @import '@fontsource-variable/baloo-2';
 
-/* Haajari tokens: a school blackboard, chalk, and the colours of the paper register. */
+/* Haajari tokens: teal #00BCC8 and lime #D0FF00 with near-black ink (the "Color palette" poster).
+ * Both brand colours are light, so text on them is always ink, never white. */
 @theme {
-  --color-board: #1e4a3b;        /* blackboard green: brand, primary actions */
-  --color-board-deep: #153629;
-  --color-chalk: #f4f7f2;        /* text on the board */
-  --color-paper: #eef2ef;        /* app background */
+  --color-board: #00bcc8;        /* brand teal: primary actions and brand fills */
+  --color-board-deep: #00a7b2;
+  --color-chalk: #101414;        /* text on teal or lime surfaces */
+  --color-paper: #f3f6f6;        /* app background */
   --color-card: #ffffff;
-  --color-ink: #13261e;          /* body text */
-  --color-muted: #5a6d64;
-  --color-line: #d3ddd7;
+  --color-ink: #101414;          /* body text */
+  --color-muted: #586466;
+  --color-line: #dce3e4;
   --color-present: #2e8b57;
   --color-absent: #c2362b;       /* kumkum red */
   --color-late: #d9951a;         /* marigold */
   --color-leave: #3f62ad;        /* register ink blue */
   --color-late-ink: #8a5a00;     /* marigold dark enough to read as text */
-  --color-slate: #1e4a3b;        /* blackboard surfaces (stay deep in both themes) */
-  --color-board-text: #1e4a3b;   /* brand green used as text and icons */
+  --color-slate: #00bcc8;        /* big teal panels: headers, class slates */
+  --color-board-text: #00747c;   /* teal deep enough to read as text on white (5.5:1) */
   --color-absent-strong: #c2362b;/* solid red fills that carry white text */
+  --color-accent: #d0ff00;       /* lime: pills, highlights, the active nav item */
+  --color-on-brand: #101414;     /* ink on teal/lime, the same in both themes */
 
   --font-sans: 'Baloo Tamma 2 Variable', 'Baloo 2 Variable', 'Noto Sans Kannada', system-ui, sans-serif;
 
-  --radius-slate: 1.25rem;
-  --shadow-lift: 0 1px 0 rgb(19 38 30 / 0.06), 0 8px 24px -12px rgb(19 38 30 / 0.25);
+  --radius-slate: 1.5rem;
+  --shadow-lift: 0 1px 0 rgb(16 20 20 / 0.05), 0 8px 24px -12px rgb(16 20 20 / 0.22);
 }
 
 @layer base {
@@ -34,59 +37,58 @@
     font-size: 17px;
     line-height: 1.5;
   }
-  :focus-visible { outline: 3px solid var(--color-late); outline-offset: 2px; border-radius: 6px; }
+  :focus-visible { outline: 3px solid var(--color-board-text); outline-offset: 2px; border-radius: 6px; }
   input, select, textarea, button { font: inherit; }
 }
 
 /*
  * Dark theme: the same roles, re-stepped for a dark surface (not an automatic inversion).
+ * Teal and lime stay bright; they carry ink text in both themes.
  * "system" follows the phone; data-theme forces light or dark (see src/lib/theme.js).
  */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme='light']) { color-scheme: dark; }
   :root:not([data-theme='light']) {
-    --color-paper: #0e1714;
-    --color-card: #16221d;
-    --color-ink: #e4ece7;
-    --color-muted: #9cb0a6;
-    --color-line: #2b3b34;
-    --color-board: #2f7a5f;
-    --color-board-deep: #3a8c6e;
+    --color-paper: #0c1112;
+    --color-card: #151c1e;
+    --color-ink: #e8eeef;
+    --color-muted: #98a6a8;
+    --color-line: #263133;
+    --color-board: #00bcc8;
+    --color-board-deep: #19cad5;
     --color-present: #4fbf83;
     --color-absent: #ef6b5f;
     --color-late: #efb23d;
     --color-leave: #85a4ee;
     --color-late-ink: #f2c063;
-    --color-slate: #173a2e;
-    --color-board-text: #6cc9a0;
+    --color-slate: #00a9b4;
+    --color-board-text: #3fd8e2;
     --color-absent-strong: #b5382d;
   }
 }
 :root[data-theme='dark'] {
   color-scheme: dark;
-  --color-paper: #0e1714;
-  --color-card: #16221d;
-  --color-ink: #e4ece7;
-  --color-muted: #9cb0a6;
-  --color-line: #2b3b34;
-  --color-board: #2f7a5f;
-  --color-board-deep: #3a8c6e;
+  --color-paper: #0c1112;
+  --color-card: #151c1e;
+  --color-ink: #e8eeef;
+  --color-muted: #98a6a8;
+  --color-line: #263133;
+  --color-board: #00bcc8;
+  --color-board-deep: #19cad5;
   --color-present: #4fbf83;
   --color-absent: #ef6b5f;
   --color-late: #efb23d;
   --color-leave: #85a4ee;
   --color-late-ink: #f2c063;
-  --color-slate: #173a2e;
-  --color-board-text: #6cc9a0;
+  --color-slate: #00a9b4;
+  --color-board-text: #3fd8e2;
   --color-absent-strong: #b5382d;
 }
 
-/* Chalk texture on board-coloured surfaces: two faint radial smudges. */
+/* Teal panels (headers, class slates): flat brand teal with a soft highlight, ink text. */
 .chalkboard {
   background-color: var(--color-slate);
-  background-image:
-    radial-gradient(120% 80% at 10% 0%, rgb(255 255 255 / 0.07), transparent 60%),
-    radial-gradient(80% 60% at 100% 100%, rgb(0 0 0 / 0.18), transparent 70%);
+  background-image: radial-gradient(120% 80% at 10% 0%, rgb(255 255 255 / 0.14), transparent 60%);
   color: var(--color-chalk);
 }
 

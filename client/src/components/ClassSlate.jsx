@@ -14,7 +14,7 @@ export default function ClassSlate({ cls, caption, role, done, onClick }) {
     <motion.button
       onClick={onClick}
       whileTap={onClick ? { scale: 0.97 } : undefined}
-      className="chalkboard relative flex aspect-[4/3] w-full flex-col justify-between overflow-hidden rounded-[var(--radius-slate)] border-[6px] border-[#8b5e34] p-4 text-left shadow-lift"
+      className="chalkboard relative flex aspect-[4/3] w-full flex-col justify-between overflow-hidden rounded-[var(--radius-slate)] border-[3px] border-on-brand p-4 text-left shadow-lift"
     >
       <span className="flex items-start justify-between gap-2 text-[15px] text-chalk/75">
         <span className="truncate">{role || t(`mode.${cls.mode}`)}</span>
@@ -28,7 +28,7 @@ export default function ClassSlate({ cls, caption, role, done, onClick }) {
         <span className="shrink-0">{t('common.students', { count: cls.studentCount })}</span>
         {caption && <span className="truncate">{caption}</span>}
       </span>
-      <span className="pointer-events-none absolute right-3 bottom-1 h-1 w-8 rounded-full bg-chalk/40" />
+      <span className="pointer-events-none absolute right-3 bottom-1 h-1 w-8 rounded-full bg-on-brand/30" />
     </motion.button>
   );
 }
