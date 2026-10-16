@@ -18,7 +18,7 @@ npm run setup      # installs everything (first time only, takes a few minutes)
 npm run dev        # starts the API and the app
 ```
 
-Open **http://localhost:5173**.
+Open **http://localhost:5180**.
 
 `npm run dev` uses a built-in temporary database filled with a demo school, so you do not need to install MongoDB.
 The first start downloads it (about 1 minute). Data resets every time you restart.
@@ -32,7 +32,7 @@ npm run seed        # loads the demo school
 npm run dev:mongo
 ```
 
-To try it on your phone, connect the phone to the same Wi-Fi and open `http://<your-computer-ip>:5173`.
+To try it on your phone, connect the phone to the same Wi-Fi and open `http://<your-computer-ip>:5180`.
 
 ### Demo of offline marking (Phase 2)
 

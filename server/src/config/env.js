@@ -5,7 +5,7 @@ const env = {
   mongoUri: process.env.MONGO_URI || 'mongodb://127.0.0.1:27017/haajari',
   jwtSecret: process.env.JWT_SECRET || 'dev-only-change-me',
   jwtExpiresIn: process.env.JWT_EXPIRES_IN || '30d',
-  clientOrigin: process.env.CLIENT_ORIGIN || 'http://localhost:5173',
+  clientOrigin: process.env.CLIENT_ORIGIN || 'http://localhost:5180',
   // 'dev' returns the OTP in the API response so the demo works without an SMS provider.
   otpMode: process.env.OTP_MODE || 'dev',
   isProd: process.env.NODE_ENV === 'production',
