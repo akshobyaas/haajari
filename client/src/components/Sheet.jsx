@@ -16,7 +16,7 @@ export default function Sheet({ open, onClose, title, children }) {
     <AnimatePresence>
       {open && (
         <div className="fixed inset-0 z-40 flex items-end justify-center sm:items-center">
-          <motion.div className="absolute inset-0 bg-ink/40" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} />
+          <motion.div className="absolute inset-0 bg-black/50" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} />
           <motion.div
             ref={ref}
             role="dialog"

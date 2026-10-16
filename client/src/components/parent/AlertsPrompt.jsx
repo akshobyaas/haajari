@@ -13,7 +13,7 @@ export default function AlertsPrompt() {
   if (state === 'denied') return <Notice tone="warn" className="mb-4">{t('parent.alertsBlocked')}</Notice>;
   return (
     <div className="mb-4 flex flex-wrap items-center gap-3 rounded-2xl border border-board/20 bg-board/5 p-4">
-      <BellRing className="size-6 shrink-0 text-board" />
+      <BellRing className="size-6 shrink-0 text-board-text" />
       <p className="min-w-48 flex-1">{t('parent.alertsOff')}</p>
       <Button loading={busy} onClick={async () => { setBusy(true); try { setState(await enablePush()); } finally { setBusy(false); } }}>
         {t('parent.alertsOn')}

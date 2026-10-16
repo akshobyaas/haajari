@@ -30,7 +30,7 @@ export default function ClassBars({ classes, threshold }) {
               {c.pct === null ? <span className="text-sm text-muted">—</span> : `${Math.round(c.pct)}%`}
             </span>
             {hover === c._id && (
-              <span className="pointer-events-none absolute top-full left-20 z-10 mt-1 rounded-lg bg-ink px-3 py-1.5 text-sm whitespace-nowrap text-chalk shadow-lift">
+              <span className="pointer-events-none absolute top-full left-20 z-10 mt-1 rounded-lg bg-ink px-3 py-1.5 text-sm whitespace-nowrap text-paper shadow-lift">
                 {c.marked ? `${c.present} ${t('dash.present')} · ${c.A} ${t('dash.absent')}${c.LV ? ` · ${c.LV} ${t('status.LV')}` : ''}` : t('dash.notTaken')}
                 {low && ` · ${t('dash.belowLine', { n: threshold })}`}
               </span>

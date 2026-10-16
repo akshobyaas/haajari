@@ -2,13 +2,15 @@
 
 MERN web app for Karnataka government schools, Pre-KG to Class 10. Kannada first, also English and Hindi.
 
-**Status: Phases 1–4 complete.**
+**Status: all 5 phases complete.**
 - Phase 1, Foundation: login, roles, school setup, classes, students, spreadsheet import, three languages.
 - Phase 2, Offline marking: one-tap marking that works with no internet and syncs later with no duplicates.
 - Phase 3, Parents and pre-primary: absence alerts with one-tap replies, leave requests, LKG–UKG arrival and pickup with QR passes.
 - Phase 4, Insights: live dashboard, emergency headcount, mid-day meal count, children to follow up, monthly register (print/PDF and Excel), shortage list, SATS export.
 
-Next: Phase 5, polish, field test on a low-cost phone, deployment and the demo.
+- Phase 5, Polish and demo: dark mode, confetti, low-data mode, faster first load, field test on a throttled low-end phone, load test, one-service deployment, demo script and backup video.
+
+Going live: [docs/DEPLOY.md](docs/DEPLOY.md) · Demo day: [docs/DEMO.md](docs/DEMO.md) · Teacher test kit: [docs/USABILITY-TEST.md](docs/USABILITY-TEST.md)
 
 ## Run it on your computer
 
@@ -48,6 +50,13 @@ saved on the device. Turn the network back on and the icons turn into ticks with
 
 `npm run dev` also marks offline once a page is open, but only `npm run demo` (or a real deployment) can
 start the app from scratch with no network, because browsers enable service workers only in built apps.
+
+### Production build (same as the deployed site)
+
+```bash
+npm run build      # builds the app into client/dist
+npm start          # one server: API + app on http://localhost:5000 (needs MONGO_URI in server/.env)
+```
 
 ## Demo logins
 
@@ -164,6 +173,32 @@ same totals (`server/tests/reports.test.js`).
 
 The SATS export holds the fields SATS asks for, but the portal's exact upload layout is not public, so check the columns
 against the current SATS screen before relying on it.
+
+## Phase 5 — polish, field test, deployment
+
+| Goal | What was done |
+| --- | --- |
+| Smooth and friendly | Dark mode (follows the phone, or set in Account), confetti when the whole class is present, page transitions, reduced-motion respected. |
+| Cheap phones, costly data | First load cut from 269 KB to about 72 KB of JavaScript (pages load on demand, Kannada built in, English/Hindi fetched only when chosen). Low-data mode in Account stops background refreshes. |
+| Real network conditions | Fixed a bug where opening a class after the signal dropped showed a blank screen: requests now never pause because the phone *looks* offline. Request timeout raised to 30 s for 2G/3G. |
+| One link for everyone | Express serves the built app and the API from one address (needed for offline start and notifications); helmet security headers and gzip on. Render blueprint in `render.yaml`. |
+
+**Field test** (production build, Chrome throttled to Slow 3G 400 kbps / 400 ms latency and a 6× slower CPU, like a ₹7,000 Android phone):
+
+| Step | Result |
+| --- | --- |
+| First open of the app | 6.8 s, 221 KB downloaded |
+| PIN to teacher home | 3.7 s |
+| Open 4-A and mark it, to "done" | 3.9 s |
+| Marks synced | 40 / 40 |
+| Second open | 4 KB downloaded (everything else from the phone) |
+
+**Lighthouse (mobile):** Performance 84–87, Accessibility 100, Best practices 100.
+
+**Load test** (`node server/scripts/loadtest.js`): 50 classes × 40 children saved at the same moment (the 9 a.m. rush), then every
+request repeated as if every phone retried: 0 failures, the 2,000 repeats recognised as duplicates, exactly 2,000 records stored.
+
+**Backup video:** [docs/haajari-demo.mp4](docs/haajari-demo.mp4) (3 minutes) — offline marking, parent alert and reply, QR pickup, headmaster dashboard and register.
 
 ## API (Phases 1–4)
 

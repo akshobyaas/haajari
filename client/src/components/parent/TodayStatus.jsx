@@ -4,7 +4,7 @@ import { fmtTime } from '../../lib/dates';
 
 const LOOK = {
   P: ['bg-present/12 text-present', CheckCircle2, 'parent.todayP'],
-  L: ['bg-late/15 text-[#8a5a00]', Clock, 'parent.todayL'],
+  L: ['bg-late/15 text-late-ink', Clock, 'parent.todayL'],
   A: ['bg-absent/10 text-absent', XCircle, 'parent.todayA'],
   LV: ['bg-leave/10 text-leave', CalendarOff, 'parent.todayLV'],
   none: ['bg-paper text-muted', HelpCircle, 'parent.todayNone'],

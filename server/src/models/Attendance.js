@@ -24,6 +24,7 @@ const attendanceSchema = new Schema(
 
 attendanceSchema.index({ studentId: 1, date: 1, period: 1 }, { unique: true });
 attendanceSchema.index({ classId: 1, date: 1 });
+attendanceSchema.index({ schoolId: 1, date: 1 }); // dashboard and alert worker read a whole day at once
 attendanceSchema.index({ clientId: 1 }, { unique: true, partialFilterExpression: { clientId: { $type: 'string' } } });
 
 module.exports = model('Attendance', attendanceSchema);

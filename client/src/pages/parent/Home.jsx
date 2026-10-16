@@ -13,6 +13,7 @@ import TodayStatus from '../../components/parent/TodayStatus';
 import ReasonButtons from '../../components/parent/ReasonButtons';
 import AlertsPrompt from '../../components/parent/AlertsPrompt';
 import PassSheet from '../../components/parent/PassSheet';
+import { live } from '../../lib/dataSaver';
 
 export default function ParentHome() {
   const { t } = useTranslation();
@@ -21,7 +22,7 @@ export default function ParentHome() {
   const { data, isLoading, error } = useQuery({
     queryKey: ['children'],
     queryFn: () => api.get('/me/children').then((r) => r.data.children),
-    refetchInterval: 60_000,
+    refetchInterval: () => live(60_000),
   });
 
   return (
@@ -51,7 +52,7 @@ export default function ParentHome() {
                   ? <p className="text-[15px] text-muted">{t('reason.given', { reason: reasonText(t, mark.reason) })}</p>
                   : <ReasonButtons attendanceId={mark._id} name={firstName(c.name)} />)}
                 <div className="flex flex-wrap gap-2">
-                  <Link to={`/p/child/${c._id}`} className="inline-flex min-h-11 flex-1 items-center justify-between gap-2 rounded-xl border border-line px-4 font-semibold text-board hover:border-board">
+                  <Link to={`/p/child/${c._id}`} className="inline-flex min-h-11 flex-1 items-center justify-between gap-2 rounded-xl border border-line px-4 font-semibold text-board-text hover:border-board">
                     <span className="inline-flex items-center gap-2"><CalendarDays className="size-5" /> {t('parent.viewAttendance')}</span>
                     <ChevronRight className="size-4" />
                   </Link>
@@ -67,7 +68,7 @@ export default function ParentHome() {
                       <p className="text-sm text-muted">{t('parent.classTeacher')}</p>
                       <p className="font-semibold">{teacher.name}</p>
                     </div>
-                    <a href={`tel:${teacher.phone}`} className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-line px-4 font-semibold text-board">
+                    <a href={`tel:${teacher.phone}`} className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-line px-4 font-semibold text-board-text">
                       <Phone className="size-4" /> {t('common.call')}
                     </a>
                   </div>

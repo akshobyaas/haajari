@@ -24,7 +24,7 @@ export default function SyncBar() {
       {attention ? <AlertTriangle className="size-5 shrink-0 text-late" /> : <CloudUpload className="size-5 shrink-0 text-muted" />}
       <span className="flex-1 text-[15px]">{attention ? t('sync.needsAttention') : t('sync.pending', { count: pending.length })}</span>
       {online && !attention && (
-        <button onClick={async () => { setBusy(true); await syncNow(); setBusy(false); }} className="inline-flex items-center gap-1 rounded-lg px-3 py-1.5 font-semibold text-board hover:bg-board/8">
+        <button onClick={async () => { setBusy(true); await syncNow(); setBusy(false); }} className="inline-flex items-center gap-1 rounded-lg px-3 py-1.5 font-semibold text-board-text hover:bg-board/8">
           {busy && <Loader2 className="size-4 animate-spin" />} {busy ? t('sync.sending') : t('sync.now')}
         </button>
       )}

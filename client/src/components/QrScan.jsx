@@ -27,7 +27,7 @@ export default function QrScan({ onResult }) {
   return (
     <div>
       <p className="mb-2 text-muted">{t('pickup.scanHint')}</p>
-      {error ? <Notice tone="warn">{t('pickup.cameraError')}</Notice> : <video ref={video} className="aspect-square w-full rounded-2xl bg-ink object-cover" muted playsInline />}
+      {error ? <Notice tone="warn">{t('pickup.cameraError')}</Notice> : <video ref={video} className="aspect-square w-full rounded-2xl bg-black object-cover" muted playsInline />}
     </div>
   );
 }

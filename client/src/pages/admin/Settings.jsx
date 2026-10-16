@@ -76,7 +76,7 @@ function SettingsForm({ school }) {
             </div>
           ))}
         </div>
-        <button type="button" onClick={() => setF({ ...f, holidays: [...f.holidays, { date: '', name: '' }] })} className="mt-3 inline-flex items-center gap-1 font-semibold text-board">
+        <button type="button" onClick={() => setF({ ...f, holidays: [...f.holidays, { date: '', name: '' }] })} className="mt-3 inline-flex items-center gap-1 font-semibold text-board-text">
           <Plus className="size-4" /> {t('admin.addHoliday')}
         </button>
       </Card>

@@ -18,7 +18,7 @@ export default function Toaster() {
       <AnimatePresence>
         {message && (
           <motion.div initial={{ y: 16, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 16, opacity: 0 }}
-            className="flex items-center gap-2 rounded-full bg-ink px-5 py-3 font-semibold text-chalk shadow-lift">
+            className="flex items-center gap-2 rounded-full bg-ink px-5 py-3 font-semibold text-paper shadow-lift">
             <CheckCircle2 className="size-5 text-present" /> {message}
           </motion.div>
         )}

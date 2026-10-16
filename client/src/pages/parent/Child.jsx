@@ -38,7 +38,7 @@ export default function Child() {
 
   return (
     <div className="mx-auto max-w-xl">
-      <Link to="/p" className="mb-3 inline-flex items-center gap-1 text-muted hover:text-board"><ArrowLeft className="size-4" /> {t('common.back')}</Link>
+      <Link to="/p" className="mb-3 inline-flex items-center gap-1 text-muted hover:text-board-text"><ArrowLeft className="size-4" /> {t('common.back')}</Link>
       {child && (
         <div className="mb-5 flex items-center gap-4">
           <Avatar name={child.name} size={56} />
@@ -55,7 +55,7 @@ export default function Child() {
         {d ? [['thisMonth', d.monthStats], ['thisYear', d.yearStats]].map(([k, s]) => (
           <Card key={k} className="p-4">
             <p className="text-muted">{t(`parent.${k}`)}</p>
-            <p className={`text-[36px] leading-tight font-bold ${s.pct !== null && s.pct < d.threshold ? 'text-absent' : 'text-board'}`}>{s.pct ?? '—'}{s.pct !== null && '%'}</p>
+            <p className={`text-[36px] leading-tight font-bold ${s.pct !== null && s.pct < d.threshold ? 'text-absent' : 'text-board-text'}`}>{s.pct ?? '—'}{s.pct !== null && '%'}</p>
             <p className="text-sm text-muted">{t('parent.days', { count: s.days })}</p>
           </Card>
         )) : [0, 1].map((i) => <Skeleton key={i} className="h-28" />)}
@@ -104,7 +104,7 @@ export default function Child() {
                 <p className="font-semibold">{fmtDay(l.from)}{l.to !== l.from && ` – ${fmtDay(l.to)}`}</p>
                 <p className="truncate text-muted">{l.reason}</p>
               </div>
-              <span className={`rounded-full px-2.5 py-0.5 text-sm font-semibold ${{ pending: 'bg-late/15 text-[#8a5a00]', approved: 'bg-present/12 text-present', rejected: 'bg-absent/10 text-absent' }[l.status]}`}>
+              <span className={`rounded-full px-2.5 py-0.5 text-sm font-semibold ${{ pending: 'bg-late/15 text-late-ink', approved: 'bg-present/12 text-present', rejected: 'bg-absent/10 text-absent' }[l.status]}`}>
                 {t(`parent.leave_${l.status}`)}
               </span>
               {l.status === 'pending' && <button onClick={() => withdraw(l._id)} className="text-sm font-semibold text-muted underline">{t('parent.withdraw')}</button>}
@@ -118,7 +118,7 @@ export default function Child() {
         <Card className="mb-4 p-4">
           <div className="mb-3 flex items-center justify-between gap-2">
             <h2 className="text-lg font-semibold">{t('parent.pickupTitle', { name: firstName(child.name) })}</h2>
-            <button onClick={() => setSheet('guardians')} className="inline-flex items-center gap-1 font-semibold text-board"><Pencil className="size-4" /> {t('parent.manage')}</button>
+            <button onClick={() => setSheet('guardians')} className="inline-flex items-center gap-1 font-semibold text-board-text"><Pencil className="size-4" /> {t('parent.manage')}</button>
           </div>
           <ul className="mb-4 space-y-2">
             {child.pickupGuardians.map((g) => (

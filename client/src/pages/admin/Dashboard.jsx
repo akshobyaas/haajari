@@ -9,12 +9,13 @@ import { useToast } from '../../components/Toast';
 import { Card, Skeleton, Notice } from '../../components/ui';
 import ClassBars from '../../components/charts/ClassBars';
 import TrendLine from '../../components/charts/TrendLine';
+import { live } from '../../lib/dataSaver';
 
 export default function Dashboard() {
   const { t } = useTranslation();
   const toast = useToast((s) => s.show);
   const school = useQuery({ queryKey: ['school'], queryFn: () => api.get('/school').then((r) => r.data.school) });
-  const today = useQuery({ queryKey: ['dash-today'], queryFn: () => api.get('/dashboard/today').then((r) => r.data), refetchInterval: 30_000 });
+  const today = useQuery({ queryKey: ['dash-today'], queryFn: () => api.get('/dashboard/today').then((r) => r.data), refetchInterval: () => live(30_000) });
   const trend = useQuery({ queryKey: ['dash-trend'], queryFn: () => api.get('/dashboard/trend').then((r) => r.data.days) });
   const risk = useQuery({ queryKey: ['risk'], queryFn: () => api.get('/risk').then((r) => r.data) });
   const summary = useQuery({ queryKey: ['summary'], queryFn: () => api.get('/dashboard/summary').then((r) => r.data) });
@@ -57,7 +58,7 @@ export default function Dashboard() {
                 <p className="mt-1 text-xl">{t('dash.inSchool')}</p>
                 <p className="text-chalk/75">{d.totals.marked ? t('dash.ofStudents', { total: d.totals.students, pct: d.totals.pct }) : t('dash.noneMarked')}</p>
               </div>
-              <Link to="/a/in-school" className="inline-flex min-h-12 items-center justify-between gap-2 self-start rounded-xl bg-chalk px-4 font-semibold text-board">
+              <Link to="/a/in-school" className="inline-flex min-h-12 items-center justify-between gap-2 self-start rounded-xl bg-chalk px-4 font-semibold text-slate">
                 <Siren className="size-5" /> {t('dash.drillBtn')} <ChevronRight className="size-4" />
               </Link>
             </>
@@ -79,7 +80,7 @@ export default function Dashboard() {
                       <span className="w-20 font-semibold">{classLabel(c)}</span>
                       <span className="min-w-0 flex-1 truncate text-muted">{c.teacher ? firstName(c.teacher.name) : '—'}</span>
                       {c.teacher?.phone && (
-                        <a href={`tel:${c.teacher.phone}`} className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[15px] font-semibold text-board hover:bg-board/8">
+                        <a href={`tel:${c.teacher.phone}`} className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[15px] font-semibold text-board-text hover:bg-board/8">
                           <Phone className="size-4" /> {t('dash.callTeacher')}
                         </a>
                       )}
@@ -108,7 +109,7 @@ export default function Dashboard() {
                   </span>
                 ))}
               </div>
-              <button onClick={sendToCook} className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-line px-4 font-semibold text-board hover:border-board">
+              <button onClick={sendToCook} className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-line px-4 font-semibold text-board-text hover:border-board">
                 <Send className="size-4" /> {t('dash.copyCook')}
               </button>
             </>
@@ -130,7 +131,7 @@ export default function Dashboard() {
         <Card className="p-5">
           <div className="mb-2 flex items-center justify-between">
             <p className="flex items-center gap-2 text-lg font-semibold"><HeartHandshake className="size-5 text-absent" /> {t('dash.followUp')}</p>
-            <Link to="/a/at-risk" className="font-semibold text-board">{t('dash.seeAll')}</Link>
+            <Link to="/a/at-risk" className="font-semibold text-board-text">{t('dash.seeAll')}</Link>
           </div>
           {risk.data && (
             <>
@@ -160,7 +161,7 @@ export default function Dashboard() {
             <div key={c.label} className="flex items-center gap-3 px-4 py-3">
               <AlertCircle className="size-5 shrink-0 text-late" />
               <span className="flex-1">{c.label}</span>
-              <Link to={c.to} className="rounded-lg px-3 py-1.5 font-semibold text-board hover:bg-board/8">{t('admin.fix')}</Link>
+              <Link to={c.to} className="rounded-lg px-3 py-1.5 font-semibold text-board-text hover:bg-board/8">{t('admin.fix')}</Link>
             </div>
           ))}
         </Card>

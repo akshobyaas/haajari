@@ -23,7 +23,7 @@ export default function LanguageSwitch({ onBoard = false }) {
             aria-checked={on}
             onClick={() => choose(l)}
             className={`rounded-full px-3 py-1 text-[15px] font-semibold transition ${
-              on ? (onBoard ? 'bg-chalk text-board' : 'bg-card text-board shadow-sm') : onBoard ? 'text-chalk/80' : 'text-muted'
+              on ? (onBoard ? 'bg-chalk text-slate' : 'bg-card text-board-text shadow-sm') : onBoard ? 'text-chalk/80' : 'text-muted'
             }`}
           >
             {t(`lang.${l}`)}

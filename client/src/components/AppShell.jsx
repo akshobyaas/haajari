@@ -1,10 +1,10 @@
 import { NavLink, Outlet } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Home, LayoutGrid, Users, GraduationCap, Settings, CircleUser, WifiOff, Bell, CalendarOff, FileSpreadsheet, HeartHandshake } from 'lucide-react';
-import { useUnread } from '../pages/Alerts';
-import { useEffect, useState } from 'react';
+import { useUnread } from '../lib/notifications';
+import { Suspense, useEffect, useState } from 'react';
 import { useAuth } from '../lib/auth';
-import { Notice } from './ui';
+import { Notice, Skeleton } from './ui';
 
 const NAV = {
   admin: [
@@ -53,7 +53,7 @@ export default function AppShell() {
   const sideItems = admin ? [...items, alertsItem, { to: '/account', icon: CircleUser, key: 'account' }] : items;
   const bottomItems = admin ? [...items.slice(0, 3), alertsItem, { to: '/account', icon: CircleUser, key: 'account' }] : items;
   const badge = (key) => key === 'alerts' && unread > 0 && (
-    <span className="absolute -top-1 -right-1 min-w-5 rounded-full bg-absent px-1 text-center text-[11px] leading-5 font-bold text-white">{unread > 9 ? '9+' : unread}</span>
+    <span className="absolute -top-1 -right-1 min-w-5 rounded-full bg-absent-strong px-1 text-center text-[11px] leading-5 font-bold text-white">{unread > 9 ? '9+' : unread}</span>
   );
 
   return (
@@ -67,7 +67,7 @@ export default function AppShell() {
         <nav className="flex flex-col gap-1">
           {sideItems.map(({ to, icon: Icon, key, end }) => (
             <NavLink key={to} to={to} end={end}
-              className={({ isActive }) => `flex items-center gap-3 rounded-xl px-3 py-2.5 font-semibold transition ${isActive ? 'bg-chalk text-board' : 'text-chalk/80 hover:bg-white/10'}`}>
+              className={({ isActive }) => `flex items-center gap-3 rounded-xl px-3 py-2.5 font-semibold transition ${isActive ? 'bg-chalk text-slate' : 'text-chalk/80 hover:bg-white/10'}`}>
               <span className="relative"><Icon className="size-5" aria-hidden />{badge(key)}</span> {t(`nav.${key}`)}
             </NavLink>
           ))}
@@ -76,12 +76,12 @@ export default function AppShell() {
 
       <div className="flex min-w-0 flex-1 flex-col">
         {!online && (
-          <div className="sticky top-0 z-30 flex items-center justify-center gap-2 bg-ink px-4 py-2 text-sm text-chalk print:hidden">
+          <div className="sticky top-0 z-30 flex items-center justify-center gap-2 bg-ink px-4 py-2 text-sm text-paper print:hidden">
             <WifiOff className="size-4" /> {t('common.offline')}
           </div>
         )}
         <main className="mx-auto w-full max-w-6xl flex-1 print:max-w-none print:p-0 px-4 pt-[max(1.25rem,env(safe-area-inset-top))] pb-28 lg:px-8 lg:pt-8 lg:pb-12">
-          <Outlet />
+          <Suspense fallback={<Skeleton className="h-48" />}><Outlet /></Suspense>
         </main>
       </div>
 
@@ -90,7 +90,7 @@ export default function AppShell() {
         <div className="mx-auto flex max-w-md justify-around">
           {bottomItems.map(({ to, icon: Icon, key, end }) => (
             <NavLink key={to} to={to} end={end}
-              className={({ isActive }) => `flex min-h-16 flex-1 flex-col items-center justify-center gap-0.5 text-[12px] font-semibold ${isActive ? 'text-board' : 'text-muted'}`}>
+              className={({ isActive }) => `flex min-h-16 flex-1 flex-col items-center justify-center gap-0.5 text-[12px] font-semibold ${isActive ? 'text-board-text' : 'text-muted'}`}>
               {({ isActive }) => (
                 <>
                   <span className={`relative rounded-full px-4 py-1 transition ${isActive ? 'bg-board/10' : ''}`}><Icon className="size-6" aria-hidden />{badge(key)}</span>

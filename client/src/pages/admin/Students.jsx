@@ -75,7 +75,7 @@ export default function Students() {
                 {s.parentIds?.[0] ? ` · ${s.parentIds[0].name} ${prettyPhone(s.parentIds[0].phone)}` : ''}
               </span>
             </span>
-            {!s.satsId && <span className="hidden items-center gap-1 rounded-full bg-late/12 px-2 py-0.5 text-sm text-[#8a5a00] sm:inline-flex"><AlertTriangle className="size-3.5" /> SATS</span>}
+            {!s.satsId && <span className="hidden items-center gap-1 rounded-full bg-late/12 px-2 py-0.5 text-sm text-late-ink sm:inline-flex"><AlertTriangle className="size-3.5" /> SATS</span>}
           </button>
         ))}
       </Card>

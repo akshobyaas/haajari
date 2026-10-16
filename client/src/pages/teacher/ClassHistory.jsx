@@ -20,7 +20,7 @@ export default function ClassHistory() {
 
   return (
     <div className="mx-auto max-w-2xl">
-      <Link to={`/t/class/${id}/mark`} className="mb-2 inline-flex items-center gap-1 text-muted hover:text-board"><ArrowLeft className="size-4" /> {t('common.back')}</Link>
+      <Link to={`/t/class/${id}/mark`} className="mb-2 inline-flex items-center gap-1 text-muted hover:text-board-text"><ArrowLeft className="size-4" /> {t('common.back')}</Link>
       <h1 className="mb-1 text-[28px] font-bold">{roster.data ? classLabel(roster.data.class) : ' '}</h1>
       <p className="mb-4 text-muted">{t('mark.history')}</p>
       {days.isError && <Notice tone="error">{t('errors.network')}</Notice>}

@@ -13,6 +13,7 @@ import { classLabel } from '../../lib/format';
 import { reasonText } from '../../lib/dates';
 import { nextStatus, STATUS_STYLE } from '../../lib/status';
 import StudentTile from '../../components/StudentTile';
+import Confetti from '../../components/Confetti';
 import Sheet from '../../components/Sheet';
 import { useToast } from '../../components/Toast';
 import { Button, Notice, Skeleton } from '../../components/ui';
@@ -138,7 +139,7 @@ export default function MarkAttendance() {
           <IconBtn label={t('mark.next')} disabled={!canNext} onClick={() => step(1)}><ChevronRight /></IconBtn>
         </div>
         {!firstSave && students.length > 0 && (
-          <button onClick={allPresent} className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[15px] font-semibold text-board hover:bg-board/8">
+          <button onClick={allPresent} className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[15px] font-semibold text-board-text hover:bg-board/8">
             <RotateCcw className="size-4" /> {t('mark.allPresent')}
           </button>
         )}
@@ -269,7 +270,7 @@ function ReasonSheet({ open, onClose, onSave }) {
       <p className="mb-3 text-muted">{t('mark.reasonIntro')}</p>
       <div className="mb-3 flex flex-wrap gap-2">
         {(quick[i18n.language] || quick.en).map((q) => (
-          <button key={q} type="button" onClick={() => setReason(q)} className={`rounded-full border px-3 py-1 ${reason === q ? 'border-board bg-board/8 text-board' : 'border-line'}`}>{q}</button>
+          <button key={q} type="button" onClick={() => setReason(q)} className={`rounded-full border px-3 py-1 ${reason === q ? 'border-board bg-board/8 text-board-text' : 'border-line'}`}>{q}</button>
         ))}
       </div>
       <textarea value={reason} onChange={(e) => setReason(e.target.value)} rows={2} placeholder={t('mark.reasonPlaceholder')}
@@ -316,6 +317,7 @@ function DoneOverlay({ done, classId, go }) {
       {done && (
         <motion.div className="chalkboard fixed inset-0 z-50 flex flex-col items-center justify-center px-6 text-center"
           initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+          <Confetti fire={done.present === done.total} />
           <motion.div initial={{ scale: 0.6, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} transition={{ type: 'spring', damping: 14, stiffness: 220, delay: 0.05 }}>
             <CheckCircle2 className="mx-auto size-20 text-chalk" strokeWidth={1.6} />
           </motion.div>
@@ -324,11 +326,11 @@ function DoneOverlay({ done, classId, go }) {
           <div className="mt-8 flex w-full max-w-xs flex-col gap-3">
             {next && (
               <button onClick={() => go(`/t/class/${next._id}/mark`)}
-                className="min-h-14 rounded-xl bg-chalk text-lg font-semibold text-board">
+                className="min-h-14 rounded-xl bg-chalk text-lg font-semibold text-slate">
                 {t('mark.nextClass', { name: classLabel(next) })}
               </button>
             )}
-            <button onClick={() => go('/t')} className={`min-h-14 rounded-xl text-lg font-semibold ${next ? 'border border-chalk/40 text-chalk' : 'bg-chalk text-board'}`}>
+            <button onClick={() => go('/t')} className={`min-h-14 rounded-xl text-lg font-semibold ${next ? 'border border-chalk/40 text-chalk' : 'bg-chalk text-slate'}`}>
               {t('mark.done')}
             </button>
           </div>

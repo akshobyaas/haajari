@@ -1,0 +1,27 @@
+# Render Blueprint: one web service serves the API and the app on one HTTPS address.
+# Deploy: Render dashboard > New > Blueprint > pick this GitHub repo. See DEPLOY.md.
+services:
+  - type: web
+    name: haajari
+    runtime: node
+    plan: free
+    region: singapore
+    # --include=dev: NODE_ENV=production would otherwise skip Vite, which the build needs.
+    buildCommand: npm install --include=dev && npm --prefix server install --omit=dev && npm --prefix client install --include=dev && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: "22"
+      - key: MONGO_URI
+        sync: false # paste the MongoDB Atlas connection string when Render asks
+      - key: JWT_SECRET
+        generateValue: true
+      - key: OTP_MODE
+        value: dev # shows the OTP on screen for the demo; use an SMS provider for a real school
+      - key: SEED_ON_EMPTY
+        value: "true" # loads the demo school on first start
+      - key: CLIENT_ORIGIN
+        value: https://haajari.onrender.com

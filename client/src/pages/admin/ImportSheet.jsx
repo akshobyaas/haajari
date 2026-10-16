@@ -57,9 +57,9 @@ export default function ImportSheet({ open, onClose }) {
     <Sheet open={open} onClose={close} title={t('admin.import')}>
       <p className="mb-2 text-muted">{t('admin.importIntro')}</p>
       <p className="mb-4 rounded-xl bg-paper px-3 py-2 font-mono text-[13px] leading-relaxed text-ink/80">{COLUMNS}</p>
-      <button onClick={template} className="mb-4 inline-flex items-center gap-2 font-semibold text-board"><Download className="size-4" /> {t('admin.template')}</button>
+      <button onClick={template} className="mb-4 inline-flex items-center gap-2 font-semibold text-board-text"><Download className="size-4" /> {t('admin.template')}</button>
       <label className="mb-4 flex min-h-24 cursor-pointer flex-col items-center justify-center gap-1 rounded-2xl border-2 border-dashed border-line p-4 text-center hover:border-board/50 focus-within:border-board">
-        <FileSpreadsheet className="size-7 text-board" />
+        <FileSpreadsheet className="size-7 text-board-text" />
         <span className="font-semibold">{file ? file.name : t('admin.chooseFile')}</span>
         <input type="file" accept=".csv,text/csv" className="sr-only" onChange={(e) => e.target.files[0] && check(e.target.files[0])} />
       </label>

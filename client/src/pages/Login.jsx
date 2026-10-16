@@ -31,7 +31,7 @@ export default function Login() {
                 role="tab"
                 aria-selected={tab === k}
                 onClick={() => setTab(k)}
-                className={`min-h-11 rounded-lg text-[15px] font-semibold transition ${tab === k ? 'bg-card text-board shadow-sm' : 'text-muted'}`}
+                className={`min-h-11 rounded-lg text-[15px] font-semibold transition ${tab === k ? 'bg-card text-board-text shadow-sm' : 'text-muted'}`}
               >
                 {t(k === 'phone' ? 'login.phoneTab' : 'login.staffTab')}
               </button>
@@ -106,7 +106,7 @@ function PhoneLogin() {
           <Button type="submit" disabled={!valid} className="w-full">{t('login.next')}</Button>
           <p className="pt-2 text-center text-[15px] text-muted">
             {t('login.firstTime')}{' '}
-            <Link to={`/setup${valid ? `?phone=${phone}` : ''}`} className="font-semibold text-board underline underline-offset-4">
+            <Link to={`/setup${valid ? `?phone=${phone}` : ''}`} className="font-semibold text-board-text underline underline-offset-4">
               {t('login.setUpPin')}
             </Link>
           </p>
@@ -126,14 +126,14 @@ function PhoneLogin() {
         </motion.form>
       ) : (
         <motion.div key="pin" initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: 24 }}>
-          <button onClick={() => { setStep('phone'); setPin(''); setError(''); }} className="mb-3 inline-flex items-center gap-1 text-[15px] text-muted hover:text-board">
+          <button onClick={() => { setStep('phone'); setPin(''); setError(''); }} className="mb-3 inline-flex items-center gap-1 text-[15px] text-muted hover:text-board-text">
             <ArrowLeft className="size-4" /> {prettyPhone(phone)} · {t('login.changeNumber')}
           </button>
           <h2 className="mb-5 text-center text-xl font-semibold">{t('login.pin')}</h2>
           <PinPad value={pin} onChange={(v) => { setPin(v); setError(''); }} onComplete={submitPin} error={error} disabled={busy} label={t('login.pin')} />
           {error && <Notice tone="error" className="mt-5">{error}</Notice>}
           <p className="mt-5 text-center text-[15px]">
-            <Link to={`/setup?phone=${phone}`} className="font-semibold text-board underline underline-offset-4">{t('login.setUpPin')}</Link>
+            <Link to={`/setup?phone=${phone}`} className="font-semibold text-board-text underline underline-offset-4">{t('login.setUpPin')}</Link>
           </p>
         </motion.div>
       )}

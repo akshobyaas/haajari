@@ -35,13 +35,13 @@ export default function LeaveInbox() {
               <Avatar name={l.studentId.name} />
               <div className="min-w-0 flex-1">
                 <p className="font-semibold">{l.studentId.name} · {classLabel(l.studentId.classId)}</p>
-                <p className="text-lg font-semibold text-board">{range(l)}</p>
+                <p className="text-lg font-semibold text-board-text">{range(l)}</p>
               </div>
             </div>
             <p className="mb-2 rounded-xl bg-paper px-3 py-2">{l.reason}</p>
             <p className="mb-3 flex items-center justify-between text-[15px] text-muted">
               {t('leaveInbox.askedBy', { name: l.requestedBy?.name })}
-              {l.requestedBy?.phone && <a href={`tel:${l.requestedBy.phone}`} className="inline-flex items-center gap-1 font-semibold text-board"><Phone className="size-4" /> {prettyPhone(l.requestedBy.phone)}</a>}
+              {l.requestedBy?.phone && <a href={`tel:${l.requestedBy.phone}`} className="inline-flex items-center gap-1 font-semibold text-board-text"><Phone className="size-4" /> {prettyPhone(l.requestedBy.phone)}</a>}
             </p>
             <div className="flex gap-3">
               <Button variant="quiet" className="flex-1" disabled={decide.isPending} onClick={() => decide.mutate({ id: l._id, decision: 'rejected' })}>{t('leaveInbox.reject')}</Button>

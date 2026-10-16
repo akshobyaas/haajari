@@ -35,11 +35,11 @@ export default function Teachers() {
                 {u.classTeacherOf.length > 0 && ` · ${t('admin.leads', { list: u.classTeacherOf.join(', ') })}`}
               </p>
             </div>
-            <span className={`rounded-full px-2.5 py-0.5 text-sm ${u.hasPin ? 'bg-present/10 text-present' : 'bg-late/12 text-[#8a5a00]'}`}>
+            <span className={`rounded-full px-2.5 py-0.5 text-sm ${u.hasPin ? 'bg-present/10 text-present' : 'bg-late/12 text-late-ink'}`}>
               {u.hasPin ? t('admin.pinSet') : t('admin.pinNotSet')}
             </span>
             {u.hasPin && (
-              <button onClick={() => reset.mutate(u.id)} className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-sm font-semibold text-board hover:bg-board/8">
+              <button onClick={() => reset.mutate(u.id)} className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-sm font-semibold text-board-text hover:bg-board/8">
                 <KeyRound className="size-4" /> {t('admin.resetPin')}
               </button>
             )}

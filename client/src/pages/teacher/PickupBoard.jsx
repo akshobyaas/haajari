@@ -15,6 +15,7 @@ import QrScan from '../../components/QrScan';
 import Avatar from '../../components/Avatar';
 import { useToast } from '../../components/Toast';
 import { Button, Notice, Skeleton } from '../../components/ui';
+import { live } from '../../lib/dataSaver';
 
 // Reads the child and guardian ids from a pass so the teacher can compare faces before handing over.
 // The server still verifies the signature; this is only for showing the photo.
@@ -32,7 +33,7 @@ const STATE_STYLE = {
   notArrived: 'border-dashed border-muted/40 bg-transparent text-muted',
   inSchool: 'border-present bg-present/10 text-ink',
   goneHome: 'border-leave bg-leave text-white',
-  A: 'border-absent bg-absent text-white',
+  A: 'border-absent-strong bg-absent-strong text-white',
   LV: 'border-leave/60 bg-leave/12 text-ink',
 };
 
@@ -45,7 +46,7 @@ export default function PickupBoard() {
   const { t } = useTranslation();
   const qc = useQueryClient();
   const toast = useToast((s) => s.show);
-  const board = useQuery({ queryKey: ['pickup', id], queryFn: () => api.get(`/pickup/class/${id}/today`).then((r) => r.data), refetchInterval: 30_000 });
+  const board = useQuery({ queryKey: ['pickup', id], queryFn: () => api.get(`/pickup/class/${id}/today`).then((r) => r.data), refetchInterval: () => live(30_000) });
   const b = board.data;
   const local = useLiveQuery(() => (b ? db.marks.where('[classId+date+period]').equals([id, b.date, 0]).toArray() : []), [id, b?.date], []);
   const [handing, setHanding] = useState(null); // { student, guardianId?, passToken? }
@@ -201,7 +202,7 @@ function HandOver({ handing, onClose, onDone, onScan }) {
           </div>
           <Button variant="quiet" className="mt-4 w-full" onClick={onScan}><ScanLine className="size-5" /> {t('pickup.scan')}</Button>
           <p className="mt-4 flex items-start gap-2 text-[15px] text-absent"><ShieldAlert className="mt-0.5 size-5 shrink-0" /> {t('pickup.notOnList')}</p>
-          {parentPhone && <a href={`tel:${parentPhone}`} className="mt-2 inline-flex items-center gap-2 font-semibold text-board"><Phone className="size-4" /> {t('pickup.callParent')}</a>}
+          {parentPhone && <a href={`tel:${parentPhone}`} className="mt-2 inline-flex items-center gap-2 font-semibold text-board-text"><Phone className="size-4" /> {t('pickup.callParent')}</a>}
         </>
       )}
       {s && g && (
@@ -227,7 +228,7 @@ function Shell({ title, onScan, children }) {
           <Link to="/t" aria-label={t('common.back')} className="-ml-2 rounded-full p-2 hover:bg-white/10"><ArrowLeft className="size-6" /></Link>
           <h1 className="flex-1 truncate text-2xl font-bold">{title || t('pickup.title')}</h1>
           {onScan && (
-            <button onClick={onScan} className="inline-flex items-center gap-1 rounded-full bg-chalk px-3 py-1.5 font-semibold text-board">
+            <button onClick={onScan} className="inline-flex items-center gap-1 rounded-full bg-chalk px-3 py-1.5 font-semibold text-slate">
               <ScanLine className="size-4" /> {t('pickup.scan')}
             </button>
           )}

@@ -431,5 +431,13 @@
     "byClass": "{{count}} in school",
     "none": "No one in school.",
     "print": "Print"
+  },
+  "settings": {
+    "theme": "Appearance",
+    "theme_system": "Phone",
+    "theme_light": "Light",
+    "theme_dark": "Dark",
+    "dataSaver": "Save mobile data",
+    "dataSaverHint": "Lists stop refreshing on their own. Attendance still saves and sends as usual."
   }
 }

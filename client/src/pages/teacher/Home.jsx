@@ -76,7 +76,7 @@ export default function TeacherHome() {
           </Link>
         )}
         <Link to="/t/reports" className="flex items-center gap-3 rounded-2xl border border-line bg-card px-4 py-3">
-          <FileSpreadsheet className="size-5 text-board" />
+          <FileSpreadsheet className="size-5 text-board-text" />
           <span className="flex-1 font-semibold">{t('reports.register')}</span>
           <ChevronRight className="size-4 text-muted" />
         </Link>

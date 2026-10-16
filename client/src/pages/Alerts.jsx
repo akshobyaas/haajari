@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
-import { useQuery, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
+import { useUnread } from '../lib/notifications';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Bell } from 'lucide-react';
@@ -8,11 +9,6 @@ import { fmtStamp } from '../lib/dates';
 import { Card, PageTitle, Skeleton, Notice } from '../components/ui';
 import AlertsPrompt from '../components/parent/AlertsPrompt';
 
-export const useUnread = () => useQuery({
-  queryKey: ['notifications'],
-  queryFn: () => api.get('/me/notifications').then((r) => r.data),
-  refetchInterval: 30_000,
-});
 
 export default function Alerts() {
   const { t } = useTranslation();
@@ -33,7 +29,7 @@ export default function Alerts() {
       <Card className="divide-y divide-line/70">
         {q.data?.notifications.map((n) => (
           <button key={n._id} onClick={() => n.payload.url && navigate(n.payload.url)} className="flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-paper/60">
-            <Bell className={`mt-1 size-5 shrink-0 ${n.readAt ? 'text-muted' : 'text-board'}`} />
+            <Bell className={`mt-1 size-5 shrink-0 ${n.readAt ? 'text-muted' : 'text-board-text'}`} />
             <span className="min-w-0 flex-1">
               <span className={`block ${n.readAt ? '' : 'font-semibold'}`}>{n.payload.title}</span>
               <span className="block text-[15px] text-muted">{n.payload.body}</span>

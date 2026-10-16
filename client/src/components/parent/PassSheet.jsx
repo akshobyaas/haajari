@@ -52,7 +52,7 @@ export default function PassSheet({ open, onClose, student }) {
           <p className="mb-3 text-muted">{chosen.name} · {chosen.relation}</p>
           {img ? <img src={img} alt={t('parent.passTitle')} className="mx-auto w-full max-w-72 rounded-2xl border border-line" /> : <Skeleton className="mx-auto aspect-square w-full max-w-72" />}
           <p className="mt-3 text-[15px] text-muted">{t('parent.passValid')}</p>
-          {guardians.length > 1 && <button onClick={() => setGuardianId(null)} className="mt-3 font-semibold text-board">{t('parent.passWho')}</button>}
+          {guardians.length > 1 && <button onClick={() => setGuardianId(null)} className="mt-3 font-semibold text-board-text">{t('parent.passWho')}</button>}
         </div>
       )}
       {error && <Notice tone="error" className="mt-3">{error}</Notice>}

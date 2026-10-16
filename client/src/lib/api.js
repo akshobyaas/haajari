@@ -2,7 +2,7 @@ import axios from 'axios';
 import i18n from '../i18n';
 import { useAuth } from './auth';
 
-export const api = axios.create({ baseURL: import.meta.env.VITE_API_URL || '/api', timeout: 15000 });
+export const api = axios.create({ baseURL: import.meta.env.VITE_API_URL || '/api', timeout: 30000 }); // generous: 2G/3G links in rural schools
 
 api.interceptors.request.use((config) => {
   const token = useAuth.getState().token;

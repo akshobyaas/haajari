@@ -45,7 +45,7 @@ export default function TrendLine({ days, threshold, height = 240 }) {
         )}
       </svg>
       {cur && (
-        <div className="pointer-events-none absolute top-0 rounded-lg bg-ink px-3 py-1.5 text-sm text-chalk shadow-lift"
+        <div className="pointer-events-none absolute top-0 rounded-lg bg-ink px-3 py-1.5 text-sm text-paper shadow-lift"
           style={{ left: `clamp(0px, calc(${(x(i) / W) * 100}% - 60px), calc(100% - 140px))` }}>
           <b>{fmtDay(cur.date, { weekday: 'short', day: 'numeric', month: 'short' })}</b> · {cur.pct}%
         </div>

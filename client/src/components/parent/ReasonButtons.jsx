@@ -38,7 +38,7 @@ export default function ReasonButtons({ attendanceId, name }) {
         {OPTIONS.map(([code, Icon]) => (
           <button key={code} onClick={() => send(code)} disabled={Boolean(busy)}
             className="flex min-h-12 items-center gap-2 rounded-xl border border-line bg-card px-3 font-semibold text-ink hover:border-board disabled:opacity-60">
-            <Icon className="size-5 text-board" aria-hidden /> {t(`reason.${code}`)}
+            <Icon className="size-5 text-board-text" aria-hidden /> {t(`reason.${code}`)}
           </button>
         ))}
       </div>

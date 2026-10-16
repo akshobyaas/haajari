@@ -10,6 +10,8 @@ import { useAuth } from '../lib/auth';
 import { prettyPhone } from '../lib/format';
 import { Card, Button, PageTitle, Notice } from '../components/ui';
 import LanguageSwitch from '../components/LanguageSwitch';
+import { getTheme, setTheme } from '../lib/theme';
+import { useDataSaver } from '../lib/dataSaver';
 import Avatar from '../components/Avatar';
 
 export default function Account() {
@@ -18,6 +20,8 @@ export default function Account() {
   const navigate = useNavigate();
   const qc = useQueryClient();
   const [blocked, setBlocked] = useState(false);
+  const [theme, setThemeState] = useState(getTheme());
+  const saver = useDataSaver();
   // Never throw away marks that exist only on this phone.
   const logOut = async () => {
     await syncNow();
@@ -37,16 +41,37 @@ export default function Account() {
           <p className="text-muted">{user.phone ? prettyPhone(user.phone) : user.email}</p>
         </div>
       </Card>
-      <Card className="mb-6 flex flex-wrap items-center justify-between gap-3 p-5">
-        <span className="font-semibold">{t('lang.choose')}</span>
-        <LanguageSwitch />
+      <Card className="mb-6 divide-y divide-line/70">
+        <div className="flex flex-wrap items-center justify-between gap-3 p-5">
+          <span className="font-semibold">{t('lang.choose')}</span>
+          <LanguageSwitch />
+        </div>
+        <div className="flex flex-wrap items-center justify-between gap-3 p-5">
+          <span className="font-semibold">{t('settings.theme')}</span>
+          <div role="radiogroup" aria-label={t('settings.theme')} className="inline-flex rounded-full bg-line/50 p-1">
+            {['system', 'light', 'dark'].map((k) => (
+              <button key={k} role="radio" aria-checked={theme === k} onClick={() => { setTheme(k); setThemeState(k); }}
+                className={`rounded-full px-3 py-1 text-[15px] font-semibold ${theme === k ? 'bg-card text-board-text shadow-sm' : 'text-muted'}`}>
+                {t(`settings.theme_${k}`)}
+              </button>
+            ))}
+          </div>
+        </div>
+        <label className="flex cursor-pointer items-center justify-between gap-4 p-5">
+          <span>
+            <span className="block font-semibold">{t('settings.dataSaver')}</span>
+            <span className="block text-sm text-muted">{t('settings.dataSaverHint')}</span>
+          </span>
+          <input type="checkbox" role="switch" checked={saver.on} onChange={(e) => saver.set(e.target.checked)}
+            className="h-7 w-12 shrink-0 cursor-pointer appearance-none rounded-full bg-line transition before:block before:size-6 before:translate-x-0.5 before:rounded-full before:bg-card before:shadow before:transition checked:bg-board checked:before:translate-x-5" />
+        </label>
       </Card>
       {user.role === 'admin' && (
         // On phones the bottom bar has room for five; the rest of the office tools live here.
         <Card className="mb-6 divide-y divide-line/70 lg:hidden">
           {[['/a/classes', LayoutGrid, 'classes'], ['/a/students', GraduationCap, 'students'], ['/a/teachers', Users, 'teachers'], ['/a/settings', Settings, 'settings']].map(([to, Icon, key]) => (
             <Link key={to} to={to} className="flex items-center gap-3 px-5 py-3.5 font-semibold">
-              <Icon className="size-5 text-board" /> <span className="flex-1">{t(`nav.${key}`)}</span> <ChevronRight className="size-4 text-muted" />
+              <Icon className="size-5 text-board-text" /> <span className="flex-1">{t(`nav.${key}`)}</span> <ChevronRight className="size-4 text-muted" />
             </Link>
           ))}
         </Card>

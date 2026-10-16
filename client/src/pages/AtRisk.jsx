@@ -69,8 +69,8 @@ function RiskCard({ flag }) {
       {parent && (
         <div className="mb-3 flex flex-wrap items-center gap-2">
           <span className="mr-auto text-[15px]">{parent.name}</span>
-          <a href={`tel:${parent.phone}`} className="inline-flex min-h-10 items-center gap-1.5 rounded-xl border border-line px-3 font-semibold text-board"><Phone className="size-4" /> {t('risk.call')}</a>
-          <a href={wa} target="_blank" rel="noreferrer" className="inline-flex min-h-10 items-center gap-1.5 rounded-xl border border-line px-3 font-semibold text-board"><MessageCircle className="size-4" /> {t('risk.whatsapp')}</a>
+          <a href={`tel:${parent.phone}`} className="inline-flex min-h-10 items-center gap-1.5 rounded-xl border border-line px-3 font-semibold text-board-text"><Phone className="size-4" /> {t('risk.call')}</a>
+          <a href={wa} target="_blank" rel="noreferrer" className="inline-flex min-h-10 items-center gap-1.5 rounded-xl border border-line px-3 font-semibold text-board-text"><MessageCircle className="size-4" /> {t('risk.whatsapp')}</a>
         </div>
       )}
       <div className="rounded-xl bg-paper p-3">

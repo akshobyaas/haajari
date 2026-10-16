@@ -64,7 +64,7 @@ export default function Setup() {
       <BoardHeader />
       <main className="relative mx-auto -mt-8 max-w-md px-4 pb-10">
         <div className="rounded-3xl bg-card p-5 shadow-lift">
-          <Link to="/login" className="mb-3 inline-flex items-center gap-1 text-[15px] text-muted hover:text-board">
+          <Link to="/login" className="mb-3 inline-flex items-center gap-1 text-[15px] text-muted hover:text-board-text">
             <ArrowLeft className="size-4" /> {t('common.back')}
           </Link>
           <AnimatePresence mode="wait" initial={false}>
@@ -95,7 +95,7 @@ export default function Setup() {
                 />
                 {error && <Notice tone="error">{error}</Notice>}
                 <Button type="submit" loading={busy} disabled={code.length !== 6} className="w-full">{t('setup.verify')}</Button>
-                <button type="button" onClick={sendCode} className="w-full text-[15px] font-semibold text-board">{t('setup.resend')}</button>
+                <button type="button" onClick={sendCode} className="w-full text-[15px] font-semibold text-board-text">{t('setup.resend')}</button>
               </motion.form>
             )}
             {(step === 'pin' || step === 'confirm') && (

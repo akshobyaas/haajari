@@ -23,7 +23,7 @@ export default function Reports() {
         <div role="tablist" className="mb-5 inline-flex rounded-xl bg-line/50 p-1">
           {tabs.map((k) => (
             <button key={k} role="tab" aria-selected={tab === k} onClick={() => setTab(k)}
-              className={`min-h-10 rounded-lg px-4 font-semibold ${tab === k ? 'bg-card text-board shadow-sm' : 'text-muted'}`}>
+              className={`min-h-10 rounded-lg px-4 font-semibold ${tab === k ? 'bg-card text-board-text shadow-sm' : 'text-muted'}`}>
               {t(`reports.${k}`)}
             </button>
           ))}
@@ -46,7 +46,7 @@ function useDownload() {
   return [busy, run];
 }
 
-const CELL = { P: '', A: 'bg-absent/15 font-bold text-absent', L: 'text-[#8a5a00] font-semibold', LV: 'text-leave font-semibold' };
+const CELL = { P: '', A: 'bg-absent/15 font-bold text-absent', L: 'text-late-ink font-semibold', LV: 'text-leave font-semibold' };
 const SHORT = { P: 'P', A: 'A', L: 'L', LV: 'Lv' };
 
 // The monthly register, laid out like the paper one. Prints on one landscape page per class.
@@ -156,7 +156,7 @@ function Shortage() {
                 <span className="min-w-0 flex-1 truncate font-semibold">{s.name}</span>
                 <span className="w-20 text-right text-sm text-muted tabular-nums">{s.present}/{s.days}</span>
                 <span className="w-14 text-right font-bold text-absent tabular-nums">{s.pct}%</span>
-                {s.parent?.phone ? <a href={`tel:${s.parent.phone}`} aria-label={`${t('common.call')} ${s.parent.name}`} className="rounded-lg p-2 text-board hover:bg-board/8"><Phone className="size-4" /></a> : <span className="w-8" />}
+                {s.parent?.phone ? <a href={`tel:${s.parent.phone}`} aria-label={`${t('common.call')} ${s.parent.name}`} className="rounded-lg p-2 text-board-text hover:bg-board/8"><Phone className="size-4" /></a> : <span className="w-8" />}
               </div>
             ))}
           </Card>

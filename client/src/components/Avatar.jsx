@@ -4,7 +4,7 @@ export default function Avatar({ name = '', size = 40 }) {
   const initial = name.trim().charAt(0).toUpperCase();
   const tint = TINTS[[...name].reduce((a, c) => a + c.charCodeAt(0), 0) % TINTS.length];
   return (
-    <span aria-hidden className="inline-flex shrink-0 items-center justify-center rounded-full font-bold text-board"
+    <span aria-hidden className="inline-flex shrink-0 items-center justify-center rounded-full font-bold text-board-text"
       style={{ width: size, height: size, background: tint, fontSize: size * 0.45 }}>
       {initial}
     </span>

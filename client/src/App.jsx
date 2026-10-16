@@ -1,29 +1,30 @@
-import { useEffect } from 'react';
+import { useEffect, lazy, Suspense } from 'react';
 import { Navigate, Route, Routes } from 'react-router-dom';
-import { startBackgroundSync } from './offline/sync';
 import { useAuth, homeFor } from './lib/auth';
-import AppShell from './components/AppShell';
 import Toaster from './components/Toast';
+import { Skeleton } from './components/ui';
 import Login from './pages/Login';
-import Setup from './pages/Setup';
-import Account from './pages/Account';
-import TeacherHome from './pages/teacher/Home';
-import MarkAttendance from './pages/teacher/MarkAttendance';
-import ClassHistory from './pages/teacher/ClassHistory';
-import LeaveInbox from './pages/teacher/LeaveInbox';
-import PickupBoard from './pages/teacher/PickupBoard';
-import Child from './pages/parent/Child';
-import Alerts from './pages/Alerts';
-import AtRisk from './pages/AtRisk';
-import Reports from './pages/Reports';
-import InSchool from './pages/InSchool';
-import { refreshPush } from './lib/push';
-import ParentHome from './pages/parent/Home';
-import Dashboard from './pages/admin/Dashboard';
-import Classes from './pages/admin/Classes';
-import Students from './pages/admin/Students';
-import Teachers from './pages/admin/Teachers';
-import Settings from './pages/admin/Settings';
+
+// Every screen except Login loads on demand; after the first visit the service worker keeps them all on the phone.
+const AppShell = lazy(() => import('./components/AppShell'));
+const Setup = lazy(() => import('./pages/Setup'));
+const Account = lazy(() => import('./pages/Account'));
+const TeacherHome = lazy(() => import('./pages/teacher/Home'));
+const MarkAttendance = lazy(() => import('./pages/teacher/MarkAttendance'));
+const ClassHistory = lazy(() => import('./pages/teacher/ClassHistory'));
+const LeaveInbox = lazy(() => import('./pages/teacher/LeaveInbox'));
+const PickupBoard = lazy(() => import('./pages/teacher/PickupBoard'));
+const Child = lazy(() => import('./pages/parent/Child'));
+const Alerts = lazy(() => import('./pages/Alerts'));
+const AtRisk = lazy(() => import('./pages/AtRisk'));
+const Reports = lazy(() => import('./pages/Reports'));
+const InSchool = lazy(() => import('./pages/InSchool'));
+const ParentHome = lazy(() => import('./pages/parent/Home'));
+const Dashboard = lazy(() => import('./pages/admin/Dashboard'));
+const Classes = lazy(() => import('./pages/admin/Classes'));
+const Students = lazy(() => import('./pages/admin/Students'));
+const Teachers = lazy(() => import('./pages/admin/Teachers'));
+const Settings = lazy(() => import('./pages/admin/Settings'));
 
 function Guard({ role, children }) {
   const user = useAuth((s) => s.user);
@@ -36,11 +37,13 @@ export default function App() {
   const user = useAuth((s) => s.user);
   useEffect(() => {
     if (!user) return;
-    if (user.role === 'teacher' || user.role === 'admin') startBackgroundSync();
-    refreshPush();
+    if (user.role === 'teacher' || user.role === 'admin') import('./offline/sync').then((m) => m.startBackgroundSync());
+    import('./lib/push').then((m) => m.refreshPush());
   }, [user]);
   return (
     <>
+      {/* Teachers on 3G download only what the morning register needs; other screens load when opened. */}
+      <Suspense fallback={<div className="mx-auto max-w-3xl p-6"><Skeleton className="h-40" /></div>}>
       <Routes>
         <Route path="/login" element={user ? <Navigate to={homeFor(user.role)} replace /> : <Login />} />
         <Route path="/setup" element={<Setup />} />
@@ -69,6 +72,7 @@ export default function App() {
         </Route>
         <Route path="*" element={<Navigate to={user ? homeFor(user.role) : '/login'} replace />} />
       </Routes>
+      </Suspense>
       <Toaster />
     </>
   );

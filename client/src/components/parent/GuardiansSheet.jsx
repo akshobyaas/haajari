@@ -50,7 +50,7 @@ export default function GuardiansSheet({ open, onClose, student }) {
           <div key={g._id || `new${i}`} className="rounded-2xl border border-line p-3">
             <div className="mb-3 flex items-center gap-3">
               {g.photoUrl ? <img src={g.photoUrl} alt="" className="size-16 rounded-xl object-cover" /> : <Avatar name={g.name || '?'} size={64} />}
-              <label className="inline-flex cursor-pointer items-center gap-1 rounded-lg px-2 py-1 font-semibold text-board hover:bg-board/8">
+              <label className="inline-flex cursor-pointer items-center gap-1 rounded-lg px-2 py-1 font-semibold text-board-text hover:bg-board/8">
                 <Camera className="size-4" /> {g.photoUrl ? t('parent.changePhoto') : t('parent.takePhoto')}
                 <input type="file" accept="image/*" capture="user" className="sr-only"
                   onChange={async (e) => e.target.files[0] && set(i, 'photoUrl', await resizeImage(e.target.files[0]))} />
@@ -68,7 +68,7 @@ export default function GuardiansSheet({ open, onClose, student }) {
           </div>
         ))}
       </div>
-      <button onClick={() => setList([...list, { name: '', relation: '', phone: '', photoUrl: '' }])} className="mt-3 inline-flex items-center gap-1 font-semibold text-board">
+      <button onClick={() => setList([...list, { name: '', relation: '', phone: '', photoUrl: '' }])} className="mt-3 inline-flex items-center gap-1 font-semibold text-board-text">
         <Plus className="size-4" /> {t('parent.addPerson')}
       </button>
       {error && <Notice tone="error" className="mt-3">{error}</Notice>}

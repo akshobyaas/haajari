@@ -4,8 +4,8 @@ import { Loader2 } from 'lucide-react';
 const variants = {
   primary: 'bg-board text-chalk hover:bg-board-deep active:scale-[0.98]',
   quiet: 'bg-card text-ink border border-line hover:border-board/40',
-  ghost: 'text-board hover:bg-board/8',
-  danger: 'bg-absent text-white hover:brightness-95',
+  ghost: 'text-board-text hover:bg-board/8',
+  danger: 'bg-absent-strong text-white hover:brightness-95',
 };
 
 export function Button({ variant = 'primary', loading, className = '', children, ...props }) {
@@ -62,7 +62,7 @@ export function Notice({ tone = 'info', children, className = '' }) {
     info: 'bg-leave/8 text-leave border-leave/20',
     error: 'bg-absent/8 text-absent border-absent/25',
     ok: 'bg-present/10 text-present border-present/25',
-    warn: 'bg-late/12 text-[#8a5a00] border-late/30',
+    warn: 'bg-late/12 text-late-ink border-late/30',
   };
   return <div role={tone === 'error' ? 'alert' : 'status'} className={`rounded-xl border px-4 py-3 text-[15px] ${tones[tone]} ${className}`}>{children}</div>;
 }

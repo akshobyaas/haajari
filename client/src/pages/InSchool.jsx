@@ -6,27 +6,28 @@ import { api } from '../lib/api';
 import { classLabel } from '../lib/format';
 import { fmtTime } from '../lib/dates';
 import { Card, Skeleton, Notice } from '../components/ui';
+import { live } from '../lib/dataSaver';
 
 // Emergency headcount: everyone marked present who has not gone home, class by class. Printable.
 export default function InSchool() {
   const { t } = useTranslation();
-  const q = useQuery({ queryKey: ['dash-today'], queryFn: () => api.get('/dashboard/today').then((r) => r.data), refetchInterval: 15_000 });
+  const q = useQuery({ queryKey: ['dash-today'], queryFn: () => api.get('/dashboard/today').then((r) => r.data), refetchInterval: () => live(15_000) });
   const d = q.data;
   return (
     <div className="print-area">
-      <Link to="/a" className="mb-2 inline-flex items-center gap-1 text-muted hover:text-board print:hidden"><ArrowLeft className="size-4" /> {t('common.back')}</Link>
+      <Link to="/a" className="mb-2 inline-flex items-center gap-1 text-muted hover:text-board-text print:hidden"><ArrowLeft className="size-4" /> {t('common.back')}</Link>
       <div className="mb-4 flex flex-wrap items-end justify-between gap-3">
         <div>
           <h1 className="text-[28px] font-bold">{t('drill.title')}</h1>
           <p className="max-w-xl text-muted">{t('drill.intro')}</p>
         </div>
-        <button onClick={() => window.print()} className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-line bg-card px-4 font-semibold text-board print:hidden"><Printer className="size-4" /> {t('drill.print')}</button>
+        <button onClick={() => window.print()} className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-line bg-card px-4 font-semibold text-board-text print:hidden"><Printer className="size-4" /> {t('drill.print')}</button>
       </div>
       {q.isError && <Notice tone="error">{t('errors.network')}</Notice>}
       {!d && <Skeleton className="h-64" />}
       {d && (
         <>
-          <p className="mb-4 text-[44px] leading-none font-bold text-board tabular-nums">{t('drill.total', { count: d.totals.inSchool })} <span className="text-base font-normal text-muted">· {fmtTime(q.dataUpdatedAt)}</span></p>
+          <p className="mb-4 text-[44px] leading-none font-bold text-board-text tabular-nums">{t('drill.total', { count: d.totals.inSchool })} <span className="text-base font-normal text-muted">· {fmtTime(q.dataUpdatedAt)}</span></p>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3 print:grid-cols-3">
             {d.classes.map((c) => (
               <Card key={c._id} className="break-inside-avoid p-4">
