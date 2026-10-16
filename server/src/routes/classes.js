@@ -42,7 +42,7 @@ router.get('/:id/roster', async (req, res) => {
   const date = q.date || todayIn(school.timezone);
   const [students, marks] = await Promise.all([
     Student.find({ classId: cls._id, active: true }).select('name rollNo gender photoUrl admissionNo').sort({ rollNo: 1, name: 1 }),
-    Attendance.find({ classId: cls._id, date }).select('studentId period status markedAt reason reasonBy').populate('markedBy', 'name'),
+    Attendance.find({ classId: cls._id, date }).select('studentId period status markedAt reason reasonBy source alertedAt').populate('markedBy', 'name'),
   ]);
   res.json({
     class: { _id: cls._id, grade: cls.grade, section: cls.section, mode: cls.mode, periodsPerDay: cls.periodsPerDay, classTeacherId: cls.classTeacherId },

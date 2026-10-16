@@ -10,6 +10,7 @@ import { loadRoster, loadClasses, editNeedsReason, localToday } from '../../offl
 import { saveMarks, retryBatch, discardBatch } from '../../offline/sync';
 import { api } from '../../lib/api';
 import { classLabel } from '../../lib/format';
+import { reasonText } from '../../lib/dates';
 import { nextStatus, STATUS_STYLE } from '../../lib/status';
 import StudentTile from '../../components/StudentTile';
 import Sheet from '../../components/Sheet';
@@ -53,16 +54,25 @@ export default function MarkAttendance() {
   const [done, setDone] = useState(null);
 
   // What is saved, per student: phone row wins over the server copy (it is newer or equal).
-  const { saved, syncOf } = useMemo(() => {
+  const { saved, syncOf, noteOf, leaveOnly } = useMemo(() => {
     const savedMap = {};
     const sync = {};
-    (r?.marks || []).filter((m) => m.period === period).forEach((m) => { savedMap[m.studentId] = m.status; sync[m.studentId] = 'server'; });
+    const notes = {};
+    const fromLeave = {};
+    (r?.marks || []).filter((m) => m.period === period).forEach((m) => {
+      savedMap[m.studentId] = m.status;
+      sync[m.studentId] = 'server';
+      if (m.reasonBy === 'parent') notes[m.studentId] = reasonText(t, m.reason);
+      if (m.source === 'leave') fromLeave[m.studentId] = true;
+    });
     localRows.forEach((m) => { savedMap[m.studentId] = m.status; sync[m.studentId] = m.synced ? 'server' : 'phone'; });
-    return { saved: savedMap, syncOf: sync };
-  }, [r, localRows, period]);
+    localRows.forEach((m) => { delete fromLeave[m.studentId]; });
+    return { saved: savedMap, syncOf: sync, noteOf: notes, leaveOnly: fromLeave };
+  }, [r, localRows, period, t]);
 
   const students = r?.students || [];
-  const firstSave = students.length > 0 && students.every((s) => saved[s._id] === undefined);
+  // Approved leave fills some days in advance; the register still counts as not taken.
+  const firstSave = students.length > 0 && students.every((s) => saved[s._id] === undefined || leaveOnly[s._id]);
   const statusOf = (sid) => draft[sid] ?? saved[sid] ?? 'P';
   const changed = students.filter((s) => draft[s._id] !== undefined && draft[s._id] !== (saved[s._id] ?? 'P'));
   const counts = students.reduce((acc, s) => ({ ...acc, [statusOf(s._id)]: acc[statusOf(s._id)] + 1 }), { P: 0, A: 0, L: 0, LV: 0 });
@@ -173,6 +183,7 @@ export default function MarkAttendance() {
           return (
             <StudentTile key={s._id} student={s} status={statusOf(s._id)} disabled={Boolean(closed)}
               sync={isDraft ? 'draft' : syncOf[s._id] || null}
+              note={noteOf[s._id]}
               onTap={() => tap(s._id)} onHold={() => setAuditFor(s)} />
           );
         })}

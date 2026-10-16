@@ -1,14 +1,14 @@
 import { useRef } from 'react';
 import { motion } from 'motion/react';
 import { useTranslation } from 'react-i18next';
-import { CloudUpload, Check } from 'lucide-react';
+import { CloudUpload, Check, MessageCircle } from 'lucide-react';
 import { STATUS_STYLE } from '../lib/status';
 
 /**
  * One child on the marking grid. Tap cycles the status; press and hold opens the change log.
  * sync: 'draft' (changed, not saved), 'phone' (saved on phone only), 'server' (on the server), null (never saved)
  */
-export default function StudentTile({ student, status, sync, onTap, onHold, disabled }) {
+export default function StudentTile({ student, status, sync, note, onTap, onHold, disabled }) {
   const { t } = useTranslation();
   const s = STATUS_STYLE[status];
   const timer = useRef(null);
@@ -45,6 +45,8 @@ export default function StudentTile({ student, status, sync, onTap, onHold, disa
       </span>
       <span className="truncate text-[15px] leading-tight font-semibold">{first}</span>
       <span className={`mt-1 self-start rounded-full px-2 text-[12px] leading-5 font-semibold ${s.chip}`}>{t(`status.${status}`)}</span>
+      {/* What the parent said, e.g. "Sick" */}
+      {note && <span className="mt-1 flex items-center gap-1 truncate text-[12px] leading-tight font-semibold opacity-95"><MessageCircle className="size-3 shrink-0" aria-label="Parent" />{note}</span>}
     </motion.button>
   );
 }

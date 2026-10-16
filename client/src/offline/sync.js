@@ -26,12 +26,13 @@ export async function saveMarks({ classId, date, period, statuses, serverMarks =
 }
 
 let running = null;
+let again = false; // marks saved while a sync was already running
 const listeners = new Set();
 export const onSyncResult = (fn) => { listeners.add(fn); return () => listeners.delete(fn); };
 
 /** Push every unsynced batch to the server. Safe to call often; runs one at a time. */
 export function syncNow() {
-  if (running) return running;
+  if (running) { again = true; return running; }
   running = (async () => {
     if (!navigator.onLine) return { pending: true };
     const pending = await db.marks.where('synced').equals(0).filter((m) => !m.error).toArray();
@@ -72,7 +73,11 @@ export function syncNow() {
       }
     }
     return { sent };
-  })().finally(() => { running = null; });
+  })().finally(() => {
+    running = null;
+    // Quick taps on the pickup board queue marks mid-sync; send them now, not in 20 seconds.
+    if (again) { again = false; syncNow(); }
+  });
   return running;
 }
 

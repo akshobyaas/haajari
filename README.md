@@ -2,11 +2,12 @@
 
 MERN web app for Karnataka government schools, Pre-KG to Class 10. Kannada first, also English and Hindi.
 
-**Status: Phases 1 and 2 complete.**
+**Status: Phases 1–3 complete.**
 - Phase 1, Foundation: login, roles, school setup, classes, students, spreadsheet import, three languages.
 - Phase 2, Offline marking: one-tap marking that works with no internet and syncs later with no duplicates.
+- Phase 3, Parents and pre-primary: absence alerts with one-tap replies, leave requests, LKG–UKG arrival and pickup with QR passes.
 
-Next: Phase 3, parents and pre-primary pickup.
+Next: Phase 4, dashboards, at-risk flags, mid-day meal count and reports.
 
 ## Run it on your computer
 
@@ -56,6 +57,8 @@ start the app from scratch with no network, because browsers enable service work
 | Teacher of Class 10 (period-wise marking) | `9000000013` | PIN `1234` |
 | Parent of Riya S (4-A) | `9100000001` | PIN `1234` |
 | Parent without a PIN yet | `9100000002` | Tap "Set up PIN"; the OTP is shown on screen in demo mode |
+| LKG class teacher (arrivals and pickup) | `9000000002` | PIN `1234` |
+| Parent of an LKG child (pickup pass) | `9100000016` | Set up a PIN first (OTP shown on screen) |
 
 Teachers are `9000000001` (Pre-KG) to `9000000013` (Class 10), all PIN `1234`.
 
@@ -65,7 +68,7 @@ Teachers are `9000000001` (Pre-KG) to `9000000013` (Class 10), all PIN `1234`.
 npm test
 ```
 
-27 API tests cover login (email, PIN, OTP setup), role access, spreadsheet import and attendance:
+40 API tests cover login (email, PIN, OTP setup), role access, spreadsheet import, alerts, leave, pickup and attendance:
 replaying the same offline batch adds nothing, an older offline mark never overwrites a newer one,
 late edits need a reason and are audited, subject teachers mark only their periods, future dates,
 Sundays and holidays are refused, and a class of 40 saves in one request.
@@ -79,11 +82,14 @@ server/                 Node + Express + MongoDB API
   src/routes/           auth, school, classes, students, users, me, dashboard
   src/middleware/       JWT auth, role checks, class/student access rules
   src/utils/            OTP, spreadsheet import, validation
-  src/services/         attendance saving rules (idempotent bulk save)
+  src/services/         attendance saving (idempotent), leave, notifications, Web Push
+  src/workers/          absence and late-pickup alerts (every 30 seconds)
   seed/                 demo school: KPS Hebbal, Mysuru — 13 classes, 389 students, 40 days of attendance
   tests/                Jest + Supertest
 client/                 React + Vite + Tailwind
-  src/pages/            Login, Setup (OTP + PIN), teacher/ (MarkAttendance, ClassHistory), parent/, admin/
+  src/pages/            Login, Setup (OTP + PIN), Alerts, teacher/ (MarkAttendance, ClassHistory,
+                        PickupBoard, LeaveInbox), parent/ (Home, Child), admin/
+  src/sw.js             service worker: offline start, notifications with reply buttons
   src/offline/          IndexedDB storage and the sync queue
   src/components/       PinPad, ClassSlate, AppShell, Sheet, ...
   src/i18n/             kn.json, en.json, hi.json
@@ -116,7 +122,30 @@ after reconnecting, exactly 40 records, no duplicates, even with the reconnect f
 How the offline sync works: `client/src/offline/` (`db.js` storage, `sync.js` queue, `roster.js` cached class lists)
 and `server/src/services/attendance.js` (`saveBulk`).
 
-## API (Phases 1–2)
+## Phase 3 — what it solves
+
+| Research issue | How Phase 3 handles it |
+| --- | --- |
+| #8 Parents told late; reasons lost in calls and notes | An absence alert reaches the parent within about 2 minutes. They answer Sick, Family, Travelling or Other with one tap, even from the notification itself, and the reason appears on the teacher's tile. |
+| #9 Pickup safety for small children | Pre-primary arrival and hand-over board. Parents keep a list of who may collect the child, with optional photos. The teacher hands over by photo, or by scanning the parent's QR pass for the day, which names the person. The parent is told who collected the child and when. Children still waiting after pickup time alert the class teacher and office. |
+| #15 Pre-primary needs | LKG–UKG classes open the pickup board instead of the register. |
+| Leave | Parents apply in the app; the class teacher approves; the days are marked as leave automatically and do not count as an unexplained absence. |
+
+**Gate check (passed):** teacher marked Riya absent; her parent was alerted 147 seconds later (target: under 5 minutes),
+tapped "Sick", and the reason showed on the teacher's tile. Pickup: the parent's QR pass was scanned through a camera
+feed, the child was handed to the grandfather named on it, and the parent was told in Kannada.
+
+How it works:
+- **Alerts wait 2 minutes** (`alertDelayMinutes` in school settings) so a mis-tap corrected at once never alarms a parent.
+  If the teacher corrects an absence after the alert, the parent gets a second message: the child is in school.
+- **Phone notifications** use Web Push (the standard behind Firebase messaging in browsers) with no third-party account.
+  Keys are created on first start in `server/.vapid.json`. Phones need HTTPS for notifications, so on a phone they
+  work once the app is deployed (Phase 5); everything also appears in the in-app Alerts tab.
+- **Pickup passes** are short signed codes (`HJ1:` + 51 characters), valid until midnight, so the QR stays simple
+  enough for a cheap phone camera. The server checks the signature; the teacher compares the photo before handing over.
+- SMS or WhatsApp for parents without smartphones plugs into `server/src/services/notify.js`.
+
+## API (Phases 1–3)
 
 | Method | Endpoint | Who |
 | --- | --- | --- |
@@ -133,5 +162,15 @@ and `server/src/services/attendance.js` (`saveBulk`).
 | POST | /api/attendance/bulk | Save a class (also the offline replay) |
 | GET | /api/attendance/class/:id/history | Last 30 days with counts |
 | GET | /api/attendance/audit?studentId=&date= | Who changed a mark, and why |
-| GET | /api/me/children | Parent |
+| GET | /api/me/children | Parent: children with today's status and pickup |
+| GET | /api/me/children/:id/attendance?month= | Parent: month calendar, month and year % |
+| POST | /api/me/absences/:id/reason | Parent: why absent |
+| POST | /api/public/absence-reply | One-tap reply from a notification (signed token) |
+| PUT | /api/me/children/:id/guardians | Parent: who may collect the child |
+| GET | /api/me/children/:id/pickup-pass?guardianId= | Parent: today's QR pass |
+| GET/POST | /api/me/notifications, /read | Everyone: alerts inbox |
+| POST/DELETE | /api/me/push | Register this phone for notifications |
+| POST/GET/PATCH/DELETE | /api/leave | Parent applies, class teacher decides |
+| GET | /api/pickup/class/:id/today | Pre-primary board |
+| POST | /api/pickup/checkout, /undo | Hand over by photo or QR pass |
 | GET | /api/dashboard/summary | Admin |

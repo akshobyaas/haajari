@@ -16,11 +16,14 @@ function createApp() {
   app.get('/api/health', (_req, res) => res.json({ ok: true, name: 'haajari', time: new Date().toISOString() }));
 
   app.use('/api/auth', require('./routes/auth'));
+  app.use('/api/public', require('./routes/public'));
   app.use('/api/school', requireAuth, require('./routes/school'));
   app.use('/api/classes', requireAuth, require('./routes/classes'));
   app.use('/api/students', requireAuth, require('./routes/students'));
   app.use('/api/users', requireAuth, requireRole('admin'), require('./routes/users'));
   app.use('/api/attendance', requireAuth, require('./routes/attendance'));
+  app.use('/api/leave', requireAuth, require('./routes/leave'));
+  app.use('/api/pickup', requireAuth, require('./routes/pickup'));
   app.use('/api/me', requireAuth, require('./routes/me'));
   app.use('/api/dashboard', requireAuth, requireRole('admin'), require('./routes/dashboard'));
 

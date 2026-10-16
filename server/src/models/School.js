@@ -18,6 +18,11 @@ const schoolSchema = new Schema(
     holidays: [holidaySchema],
     defaultLanguage: { type: String, enum: ['kn', 'en', 'hi'], default: 'kn' },
     timezone: { type: String, default: 'Asia/Kolkata' },
+    // Parents hear about an absence this many minutes after it is saved, so a quick correction does not alarm them.
+    alertDelayMinutes: { type: Number, default: 2, min: 0, max: 60 },
+    // Pre-primary pickup time; staff are alerted if a child is still waiting this many minutes after it.
+    pickupTime: { type: String, default: '12:30' },
+    pickupGraceMinutes: { type: Number, default: 20, min: 0, max: 180 },
     // Teachers may mark or correct this many past days; admins any day.
     teacherBackdateDays: { type: Number, default: 7, min: 0, max: 60 },
   },

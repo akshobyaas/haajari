@@ -12,6 +12,11 @@ export default defineConfig({
     // Installable app + offline app shell. Attendance data itself lives in IndexedDB (src/offline).
     VitePWA({
       registerType: 'autoUpdate',
+      // Own service worker (src/sw.js) so notifications can carry reply buttons.
+      strategies: 'injectManifest',
+      srcDir: 'src',
+      filename: 'sw.js',
+      injectManifest: { globPatterns: ['**/*.{js,css,html,svg,png,woff2}'], maximumFileSizeToCacheInBytes: 3 * 1024 * 1024 },
       includeAssets: ['icon.svg'],
       manifest: {
         name: 'Haajari — School attendance',
@@ -27,12 +32,6 @@ export default defineConfig({
           { src: '/pwa-512.png', sizes: '512x512', type: 'image/png' },
           { src: '/pwa-512-maskable.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' },
         ],
-      },
-      workbox: {
-        globPatterns: ['**/*.{js,css,html,svg,png,woff2}'],
-        navigateFallback: '/index.html',
-        navigateFallbackDenylist: [/^\/api\//],
-        maximumFileSizeToCacheInBytes: 3 * 1024 * 1024,
       },
       devOptions: { enabled: false },
     }),

@@ -10,6 +10,11 @@ import Account from './pages/Account';
 import TeacherHome from './pages/teacher/Home';
 import MarkAttendance from './pages/teacher/MarkAttendance';
 import ClassHistory from './pages/teacher/ClassHistory';
+import LeaveInbox from './pages/teacher/LeaveInbox';
+import PickupBoard from './pages/teacher/PickupBoard';
+import Child from './pages/parent/Child';
+import Alerts from './pages/Alerts';
+import { refreshPush } from './lib/push';
 import ParentHome from './pages/parent/Home';
 import Dashboard from './pages/admin/Dashboard';
 import Classes from './pages/admin/Classes';
@@ -26,7 +31,11 @@ function Guard({ role, children }) {
 
 export default function App() {
   const user = useAuth((s) => s.user);
-  useEffect(() => { if (user?.role === 'teacher' || user?.role === 'admin') startBackgroundSync(); }, [user]);
+  useEffect(() => {
+    if (!user) return;
+    if (user.role === 'teacher' || user.role === 'admin') startBackgroundSync();
+    refreshPush();
+  }, [user]);
   return (
     <>
       <Routes>
@@ -34,9 +43,13 @@ export default function App() {
         <Route path="/setup" element={<Setup />} />
         {/* Full-screen, no navigation bar: nothing to tap by mistake while marking. */}
         <Route path="/t/class/:id/mark" element={<Guard role="teacher"><MarkAttendance /></Guard>} />
+        <Route path="/t/class/:id/pickup" element={<Guard role="teacher"><PickupBoard /></Guard>} />
         <Route path="/t/class/:id" element={<Navigate to="mark" replace />} />
         <Route element={<Guard><AppShell /></Guard>}>
           <Route path="/account" element={<Account />} />
+          <Route path="/alerts" element={<Alerts />} />
+          <Route path="/t/leave" element={<Guard role="teacher"><LeaveInbox /></Guard>} />
+          <Route path="/p/child/:id" element={<Guard role="parent"><Child /></Guard>} />
           <Route path="/t" element={<Guard role="teacher"><TeacherHome /></Guard>} />
           <Route path="/t/class/:id/history" element={<Guard role="teacher"><ClassHistory /></Guard>} />
           <Route path="/p" element={<Guard role="parent"><ParentHome /></Guard>} />

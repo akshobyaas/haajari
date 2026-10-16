@@ -12,3 +12,9 @@ const signSetup = (userId) => jwt.sign({ sub: String(userId), purpose: 'pin-setu
 const verify = (token) => jwt.verify(token, env.jwtSecret);
 
 module.exports = { signAuth, signSetup, verify };
+
+// Lets a parent answer "why absent?" straight from the notification, without opening a session.
+const signAbsenceReply = (attendanceId, parentId) =>
+  jwt.sign({ purpose: 'absence-reply', aid: String(attendanceId), uid: String(parentId) }, env.jwtSecret, { expiresIn: '3d' });
+
+module.exports.signAbsenceReply = signAbsenceReply;

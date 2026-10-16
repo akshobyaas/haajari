@@ -10,6 +10,8 @@ const pickupSchema = new Schema(
     checkOutAt: Date,
     checkOutBy: { type: Schema.Types.ObjectId, ref: 'User' },
     collectedBy: { name: String, relation: String, guardianId: Schema.Types.ObjectId },
+    method: { type: String, enum: ['qr', 'manual'] },
+    lateAlertedAt: Date,
   },
   { timestamps: true }
 );

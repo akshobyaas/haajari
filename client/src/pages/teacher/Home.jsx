@@ -1,7 +1,9 @@
 import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
+import { CalendarOff, ChevronRight } from 'lucide-react';
+import { api } from '../../lib/api';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../lib/auth';
 import { firstName } from '../../lib/format';
@@ -16,6 +18,8 @@ export default function TeacherHome() {
   const user = useAuth((s) => s.user);
   const navigate = useNavigate();
   const { data, isLoading, error } = useQuery({ queryKey: ['classes'], queryFn: loadClasses });
+  const leave = useQuery({ queryKey: ['leave'], queryFn: () => api.get('/leave', { params: { status: 'pending' } }).then((r) => r.data.leaves) });
+  const pendingLeave = (leave.data || []).filter((l) => l.status === 'pending').length;
   const onPhone = useLiveQuery(
     () => (data?.date ? db.marks.where('synced').equals(0).filter((m) => m.date === data.date).toArray() : []),
     [data?.date],
@@ -45,13 +49,20 @@ export default function TeacherHome() {
       <p className="text-muted">{today}</p>
       <h1 className="mb-5 text-[28px] font-bold leading-tight">{t('teacher.greeting', { name: firstName(user.name) })}</h1>
       <SyncBar />
+      {pendingLeave > 0 && (
+        <Link to="/t/leave" className="mb-4 flex items-center gap-3 rounded-2xl border border-late/40 bg-late/10 px-4 py-3">
+          <CalendarOff className="size-5 text-late" />
+          <span className="flex-1 font-semibold">{t('leaveInbox.waiting', { count: pendingLeave })}</span>
+          <ChevronRight className="size-4 text-muted" />
+        </Link>
+      )}
       {data?.closed && <Notice tone="info" className="mb-4">{t('home.closedToday', { reason: data.closed })}</Notice>}
       <h2 className="mb-3 text-lg font-semibold">{t('teacher.yourClasses')}</h2>
       {error && <Notice tone="error">{t('errors.network')}</Notice>}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {isLoading && [0, 1].map((i) => <Skeleton key={i} className="aspect-[4/3]" />)}
         {data?.classes.map((c) => (
-          <ClassSlate key={c._id} cls={c} role={roleOf(c)} caption={caption(c)} done={Boolean(c.today)} onClick={() => navigate(`/t/class/${c._id}/mark`)} />
+          <ClassSlate key={c._id} cls={c} role={roleOf(c)} caption={caption(c)} done={Boolean(c.today)} onClick={() => navigate(`/t/class/${c._id}/${c.mode === 'checkin' ? 'pickup' : 'mark'}`)} />
         ))}
       </div>
       {data?.classes.length === 0 && <Notice tone="info">{t('teacher.noClasses')}</Notice>}

@@ -55,6 +55,7 @@ async function saveBulk({ user, school, cls, date, period, marks, editReason }) 
   const ops = [];
   const audits = [];
   let pendingEdits = 0;
+  const cleared = []; // absences parents were told about, now corrected
 
   for (const m of marks) {
     const prev = byStudent.get(String(m.studentId));
@@ -74,9 +75,10 @@ async function saveBulk({ user, school, cls, date, period, marks, editReason }) 
       ops.push({
         updateOne: {
           filter: { _id: prev._id },
-          update: { $set: { status: m.status, markedBy: user._id, markedAt, clientId: m.clientId } },
+          update: { $set: { status: m.status, markedBy: user._id, markedAt, clientId: m.clientId, source: 'teacher' }, ...(m.status === 'A' ? {} : { $unset: { alertedAt: 1 } }) },
         },
       });
+      if (prev.status === 'A' && prev.alertedAt && ['P', 'L'].includes(m.status)) cleared.push(prev);
       audits.push({
         schoolId: school._id, entity: 'attendance', entityId: prev._id, action: 'update', changedBy: user._id,
         from: prev.status, to: m.status, reason: editReason || 'Changed within marking window',
@@ -100,6 +102,7 @@ async function saveBulk({ user, school, cls, date, period, marks, editReason }) 
   }
   if (ops.length) await Attendance.bulkWrite(ops, { ordered: false });
   if (audits.length) await AuditLog.insertMany(audits);
+  if (cleared.length) await require('../workers/alerts').notifyAbsenceCleared(cleared);
 
   const summary = results.reduce((acc, r) => ({ ...acc, [r.result]: (acc[r.result] || 0) + 1 }), {});
   return { date, period, summary, results };
@@ -111,15 +114,17 @@ async function todaySummary(classes, date) {
   const periodWise = classes.filter((c) => c.mode === 'period').map((c) => c._id);
   const rows = await Attendance.aggregate([
     { $match: { date, $or: [{ classId: { $in: daily }, period: 0 }, { classId: { $in: periodWise }, period: 1 }] } },
-    { $group: { _id: { classId: '$classId', status: '$status' }, n: { $sum: 1 } } },
+    { $group: { _id: { classId: '$classId', status: '$status', source: '$source' }, n: { $sum: 1 } } },
   ]);
   const out = {};
   rows.forEach((r) => {
     const k = String(r._id.classId);
     out[k] ||= { P: 0, A: 0, L: 0, LV: 0, marked: 0 };
-    out[k][r._id.status] = r.n;
-    out[k].marked += r.n;
+    out[k][r._id.status] += r.n;
+    // Leave approved in advance does not mean the teacher has taken the register.
+    if (r._id.source !== 'leave') out[k].marked += r.n;
   });
+  Object.keys(out).forEach((k) => { if (!out[k].marked) delete out[k]; });
   return out;
 }
 

@@ -1,6 +1,7 @@
 import { NavLink, Outlet } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Home, LayoutGrid, Users, GraduationCap, Settings, CircleUser, WifiOff } from 'lucide-react';
+import { Home, LayoutGrid, Users, GraduationCap, Settings, CircleUser, WifiOff, Bell, CalendarOff } from 'lucide-react';
+import { useUnread } from '../pages/Alerts';
 import { useEffect, useState } from 'react';
 import { useAuth } from '../lib/auth';
 import { Notice } from './ui';
@@ -15,10 +16,13 @@ const NAV = {
   ],
   teacher: [
     { to: '/t', icon: Home, key: 'home', end: true },
+    { to: '/t/leave', icon: CalendarOff, key: 'leave' },
+    { to: '/alerts', icon: Bell, key: 'alerts' },
     { to: '/account', icon: CircleUser, key: 'account' },
   ],
   parent: [
     { to: '/p', icon: Home, key: 'home', end: true },
+    { to: '/alerts', icon: Bell, key: 'alerts' },
     { to: '/account', icon: CircleUser, key: 'account' },
   ],
 };
@@ -41,8 +45,14 @@ export default function AppShell() {
   const online = useOnline();
   const items = NAV[user.role];
   const admin = user.role === 'admin';
-  // Admin gets Account in the sidebar too.
-  const sideItems = admin ? [...items, { to: '/account', icon: CircleUser, key: 'account' }] : items;
+  const unread = useUnread().data?.unread || 0;
+  const alertsItem = { to: '/alerts', icon: Bell, key: 'alerts' };
+  // Admin: everything in the sidebar; on phones the five most used.
+  const sideItems = admin ? [...items, alertsItem, { to: '/account', icon: CircleUser, key: 'account' }] : items;
+  const bottomItems = admin ? [...items.slice(0, 3), alertsItem, { to: '/account', icon: CircleUser, key: 'account' }] : items;
+  const badge = (key) => key === 'alerts' && unread > 0 && (
+    <span className="absolute -top-1 -right-1 min-w-5 rounded-full bg-absent px-1 text-center text-[11px] leading-5 font-bold text-white">{unread > 9 ? '9+' : unread}</span>
+  );
 
   return (
     <div className="min-h-dvh lg:flex">
@@ -56,7 +66,7 @@ export default function AppShell() {
           {sideItems.map(({ to, icon: Icon, key, end }) => (
             <NavLink key={to} to={to} end={end}
               className={({ isActive }) => `flex items-center gap-3 rounded-xl px-3 py-2.5 font-semibold transition ${isActive ? 'bg-chalk text-board' : 'text-chalk/80 hover:bg-white/10'}`}>
-              <Icon className="size-5" aria-hidden /> {t(`nav.${key}`)}
+              <span className="relative"><Icon className="size-5" aria-hidden />{badge(key)}</span> {t(`nav.${key}`)}
             </NavLink>
           ))}
         </nav>
@@ -76,12 +86,12 @@ export default function AppShell() {
       {/* Bottom bar: phones and tablets */}
       <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-line bg-card/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden">
         <div className="mx-auto flex max-w-md justify-around">
-          {(admin ? items.slice(0, 4).concat({ to: '/account', icon: CircleUser, key: 'account' }) : items).map(({ to, icon: Icon, key, end }) => (
+          {bottomItems.map(({ to, icon: Icon, key, end }) => (
             <NavLink key={to} to={to} end={end}
               className={({ isActive }) => `flex min-h-16 flex-1 flex-col items-center justify-center gap-0.5 text-[12px] font-semibold ${isActive ? 'text-board' : 'text-muted'}`}>
               {({ isActive }) => (
                 <>
-                  <span className={`rounded-full px-4 py-1 transition ${isActive ? 'bg-board/10' : ''}`}><Icon className="size-6" aria-hidden /></span>
+                  <span className={`relative rounded-full px-4 py-1 transition ${isActive ? 'bg-board/10' : ''}`}><Icon className="size-6" aria-hidden />{badge(key)}</span>
                   {t(`nav.${key}`)}
                 </>
               )}
