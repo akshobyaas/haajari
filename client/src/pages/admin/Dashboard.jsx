@@ -1,50 +1,163 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { CheckCircle2, AlertCircle } from 'lucide-react';
+import { Phone, Soup, Siren, ChevronRight, AlertCircle, CheckCircle2, Send, HeartHandshake } from 'lucide-react';
 import { api } from '../../lib/api';
-import { Card, Skeleton, PageTitle, Notice } from '../../components/ui';
+import { classLabel, gradeShort, firstName } from '../../lib/format';
+import { fmtDay, fmtTime } from '../../lib/dates';
+import { useToast } from '../../components/Toast';
+import { Card, Skeleton, Notice } from '../../components/ui';
+import ClassBars from '../../components/charts/ClassBars';
+import TrendLine from '../../components/charts/TrendLine';
 
 export default function Dashboard() {
   const { t } = useTranslation();
+  const toast = useToast((s) => s.show);
   const school = useQuery({ queryKey: ['school'], queryFn: () => api.get('/school').then((r) => r.data.school) });
-  const { data: s, isLoading, error } = useQuery({ queryKey: ['summary'], queryFn: () => api.get('/dashboard/summary').then((r) => r.data) });
+  const today = useQuery({ queryKey: ['dash-today'], queryFn: () => api.get('/dashboard/today').then((r) => r.data), refetchInterval: 30_000 });
+  const trend = useQuery({ queryKey: ['dash-trend'], queryFn: () => api.get('/dashboard/trend').then((r) => r.data.days) });
+  const risk = useQuery({ queryKey: ['risk'], queryFn: () => api.get('/risk').then((r) => r.data) });
+  const summary = useQuery({ queryKey: ['summary'], queryFn: () => api.get('/dashboard/summary').then((r) => r.data) });
+  const d = today.data;
+  const threshold = school.data?.alertThreshold ?? 75;
+  const unmarked = d?.classes.filter((c) => !c.marked) || [];
+  const avg = trend.data?.length ? Math.round(trend.data.reduce((a, x) => a + x.pct, 0) / trend.data.length) : null;
 
-  const checks = s
-    ? [
-        { n: s.classesWithoutTeacher, label: t('admin.checkTeacher', { count: s.classesWithoutTeacher }), to: '/a/classes' },
-        { n: s.studentsWithoutSats, label: t('admin.checkSats', { count: s.studentsWithoutSats }), to: '/a/students' },
-        { n: s.studentsWithoutParent, label: t('admin.checkParent', { count: s.studentsWithoutParent }), to: '/a/students' },
-      ].filter((c) => c.n > 0)
-    : [];
+  const sendToCook = async () => {
+    const meal = d.classes.filter((c) => c.meal && c.marked);
+    const text = `${t('dash.mealMsg', { date: fmtDay(d.date, { day: 'numeric', month: 'long' }), total: d.totals.meals })}\n${meal.map((c) => `${gradeShort(c.grade)} ${c.section}: ${c.present}`).join('\n')}`;
+    if (navigator.share) { try { await navigator.share({ text }); return; } catch { /* cancelled */ } }
+    try { await navigator.clipboard.writeText(text); toast(t('dash.copied')); } catch { window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, '_blank'); }
+  };
+
+  const checks = summary.data ? [
+    { n: summary.data.classesWithoutTeacher, label: t('admin.checkTeacher', { count: summary.data.classesWithoutTeacher }), to: '/a/classes' },
+    { n: summary.data.studentsWithoutSats, label: t('admin.checkSats', { count: summary.data.studentsWithoutSats }), to: '/a/students' },
+    { n: summary.data.studentsWithoutParent, label: t('admin.checkParent', { count: summary.data.studentsWithoutParent }), to: '/a/students' },
+  ].filter((c) => c.n > 0) : [];
 
   return (
     <div>
-      <PageTitle title={school.data?.name || ' '} sub={school.data && `${school.data.district} · ${school.data.academicYear}`} />
-      {error && <Notice tone="error">{t('errors.network')}</Notice>}
-      <div className="mb-8 grid grid-cols-2 gap-3 md:grid-cols-4">
-        {isLoading && [0, 1, 2, 3].map((i) => <Skeleton key={i} className="h-24" />)}
-        {s && [
-          [t('admin.statStudents'), s.students],
-          [t('admin.statClasses'), s.classes],
-          [t('admin.statTeachers'), s.teachers],
-          [t('admin.statParents'), s.parents],
-        ].map(([label, n]) => (
-          <Card key={label} className="p-4">
-            <p className="text-[36px] leading-none font-bold text-board">{n}</p>
-            <p className="mt-1 text-muted">{label}</p>
-          </Card>
-        ))}
+      <div className="mb-5 flex flex-wrap items-end justify-between gap-2">
+        <div>
+          <h1 className="text-[28px] leading-tight font-bold">{school.data?.name || ' '}</h1>
+          <p className="text-muted">{d && `${fmtDay(d.date, { weekday: 'long', day: 'numeric', month: 'long' })} · ${t('dash.updated', { time: fmtTime(today.dataUpdatedAt) })}`}</p>
+        </div>
       </div>
-      <h2 className="text-lg font-semibold">{t('admin.setupTitle')}</h2>
-      <p className="mb-3 text-muted">{t('admin.setupIntro')}</p>
-      {s && (
-        <Card className="divide-y divide-line/70">
-          {checks.length === 0 && (
-            <p className="flex items-center gap-3 p-4 font-semibold text-present"><CheckCircle2 className="size-5" /> {t('admin.allGood')}</p>
+      {today.isError && <Notice tone="error" className="mb-4">{t('errors.network')}</Notice>}
+      {d?.closed && <Notice tone="info" className="mb-4">{t('dash.closed', { reason: d.closed })}</Notice>}
+
+      {/* Headline: who is here right now, and how many registers are in */}
+      <div className="mb-4 grid gap-4 lg:grid-cols-[1.3fr_1fr]">
+        <Card className="chalkboard flex flex-col justify-between gap-6 border-0 p-6">
+          {d ? (
+            <>
+              <div>
+                <p className="text-[72px] leading-none font-bold tabular-nums">{d.totals.inSchool}</p>
+                <p className="mt-1 text-xl">{t('dash.inSchool')}</p>
+                <p className="text-chalk/75">{d.totals.marked ? t('dash.ofStudents', { total: d.totals.students, pct: d.totals.pct }) : t('dash.noneMarked')}</p>
+              </div>
+              <Link to="/a/in-school" className="inline-flex min-h-12 items-center justify-between gap-2 self-start rounded-xl bg-chalk px-4 font-semibold text-board">
+                <Siren className="size-5" /> {t('dash.drillBtn')} <ChevronRight className="size-4" />
+              </Link>
+            </>
+          ) : <Skeleton className="h-40 bg-white/10" />}
+        </Card>
+        <Card className="p-5">
+          {d ? (
+            <>
+              <p className="mb-1 text-lg font-semibold">{t('dash.registers', { marked: d.totals.marked, total: d.totals.classes })}</p>
+              <div className="mb-4 h-2 overflow-hidden rounded-full bg-line/60">
+                <div className="h-full rounded-full bg-board" style={{ width: `${(d.totals.marked / d.totals.classes) * 100}%` }} />
+              </div>
+              {unmarked.length === 0 ? (
+                <p className="flex items-center gap-2 font-semibold text-present"><CheckCircle2 className="size-5" /> {t('dash.allTaken')}</p>
+              ) : (
+                <ul className="max-h-56 divide-y divide-line/70 overflow-y-auto">
+                  {unmarked.map((c) => (
+                    <li key={c._id} className="flex items-center gap-3 py-2">
+                      <span className="w-20 font-semibold">{classLabel(c)}</span>
+                      <span className="min-w-0 flex-1 truncate text-muted">{c.teacher ? firstName(c.teacher.name) : '—'}</span>
+                      {c.teacher?.phone && (
+                        <a href={`tel:${c.teacher.phone}`} className="inline-flex items-center gap-1 rounded-lg px-2 py-1 text-[15px] font-semibold text-board hover:bg-board/8">
+                          <Phone className="size-4" /> {t('dash.callTeacher')}
+                        </a>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </>
+          ) : <Skeleton className="h-40" />}
+        </Card>
+      </div>
+
+      <div className="mb-4 grid gap-4 lg:grid-cols-[1fr_1.3fr]">
+        {/* Mid-day meal */}
+        <Card className="p-5">
+          <p className="mb-2 flex items-center gap-2 text-lg font-semibold"><Soup className="size-5 text-late" /> {t('dash.meals')}</p>
+          {d ? (
+            <>
+              <p className="text-[48px] leading-none font-bold tabular-nums">{d.totals.meals}</p>
+              <p className="mb-3 text-muted">{t('dash.plates')}</p>
+              <p className="mb-3 text-sm text-muted">{d.totals.mealClassesUnmarked ? t('dash.mealNote', { count: d.totals.mealClassesUnmarked }) : t('dash.mealNote_zero')}</p>
+              <div className="mb-4 flex flex-wrap gap-1.5">
+                {d.classes.filter((c) => c.meal).map((c) => (
+                  <span key={c._id} className={`rounded-lg px-2 py-0.5 text-sm tabular-nums ${c.marked ? 'bg-paper' : 'border border-dashed border-line text-muted'}`}>
+                    {gradeShort(c.grade)} {c.section}: <b>{c.marked ? c.present : '—'}</b>
+                  </span>
+                ))}
+              </div>
+              <button onClick={sendToCook} className="inline-flex min-h-11 items-center gap-2 rounded-xl border border-line px-4 font-semibold text-board hover:border-board">
+                <Send className="size-4" /> {t('dash.copyCook')}
+              </button>
+            </>
+          ) : <Skeleton className="h-40" />}
+        </Card>
+        {/* Class-wise today */}
+        <Card className="p-5">
+          <p className="mb-3 text-lg font-semibold">{t('dash.classesToday')}</p>
+          {d ? <ClassBars classes={d.classes} threshold={threshold} /> : <Skeleton className="h-64" />}
+        </Card>
+      </div>
+
+      <div className="mb-4 grid gap-4 lg:grid-cols-[1.3fr_1fr]">
+        <Card className="p-5">
+          <p className="text-lg font-semibold">{t('dash.trend')}</p>
+          {avg !== null && <p className="mb-2 text-muted">{t('dash.trendAvg', { pct: avg })}</p>}
+          {trend.data ? <TrendLine days={trend.data} threshold={threshold} /> : <Skeleton className="h-40" />}
+        </Card>
+        <Card className="p-5">
+          <div className="mb-2 flex items-center justify-between">
+            <p className="flex items-center gap-2 text-lg font-semibold"><HeartHandshake className="size-5 text-absent" /> {t('dash.followUp')}</p>
+            <Link to="/a/at-risk" className="font-semibold text-board">{t('dash.seeAll')}</Link>
+          </div>
+          {risk.data && (
+            <>
+              <p className="mb-2 text-muted">{risk.data.flags.length ? t('dash.followUpCount', { count: risk.data.flags.length }) : t('risk.none')}</p>
+              <ul className="divide-y divide-line/70">
+                {risk.data.flags.slice(0, 5).map((f) => (
+                  <li key={f._id} className="flex items-center gap-3 py-2">
+                    <span className="min-w-0 flex-1 truncate">
+                      <span className="block truncate font-semibold">{f.studentId?.name}</span>
+                      <span className="block text-sm text-muted">{classLabel(f.classId)}</span>
+                    </span>
+                    <span className="shrink-0 text-right text-sm font-semibold whitespace-nowrap text-absent">
+                      {f.reasons.includes('streak') ? t('risk.streak', { count: f.streak }) : t('risk.low_month', { pct: f.monthPct ?? f.yearPct })}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </>
           )}
+        </Card>
+      </div>
+
+      {checks.length > 0 && (
+        <Card className="divide-y divide-line/70">
+          <p className="px-4 pt-3 pb-2 font-semibold">{t('dash.setup')}</p>
           {checks.map((c) => (
-            <div key={c.label} className="flex items-center gap-3 p-4">
+            <div key={c.label} className="flex items-center gap-3 px-4 py-3">
               <AlertCircle className="size-5 shrink-0 text-late" />
               <span className="flex-1">{c.label}</span>
               <Link to={c.to} className="rounded-lg px-3 py-1.5 font-semibold text-board hover:bg-board/8">{t('admin.fix')}</Link>

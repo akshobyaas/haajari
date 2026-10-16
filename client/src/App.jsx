@@ -14,6 +14,9 @@ import LeaveInbox from './pages/teacher/LeaveInbox';
 import PickupBoard from './pages/teacher/PickupBoard';
 import Child from './pages/parent/Child';
 import Alerts from './pages/Alerts';
+import AtRisk from './pages/AtRisk';
+import Reports from './pages/Reports';
+import InSchool from './pages/InSchool';
 import { refreshPush } from './lib/push';
 import ParentHome from './pages/parent/Home';
 import Dashboard from './pages/admin/Dashboard';
@@ -55,6 +58,11 @@ export default function App() {
           <Route path="/p" element={<Guard role="parent"><ParentHome /></Guard>} />
           <Route path="/a" element={<Guard role="admin"><Dashboard /></Guard>} />
           <Route path="/a/classes" element={<Guard role="admin"><Classes /></Guard>} />
+          <Route path="/a/at-risk" element={<Guard role="admin"><AtRisk /></Guard>} />
+          <Route path="/a/reports" element={<Guard role="admin"><Reports /></Guard>} />
+          <Route path="/a/in-school" element={<Guard role="admin"><InSchool /></Guard>} />
+          <Route path="/t/at-risk" element={<Guard role="teacher"><AtRisk /></Guard>} />
+          <Route path="/t/reports" element={<Guard role="teacher"><Reports /></Guard>} />
           <Route path="/a/students" element={<Guard role="admin"><Students /></Guard>} />
           <Route path="/a/teachers" element={<Guard role="admin"><Teachers /></Guard>} />
           <Route path="/a/settings" element={<Guard role="admin"><Settings /></Guard>} />

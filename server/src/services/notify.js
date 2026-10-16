@@ -43,6 +43,11 @@ const TEXT = {
     en: (p) => [p.approved ? 'Leave approved' : 'Leave not approved', `${p.studentName}: ${p.from} – ${p.to}`],
     hi: (p) => [p.approved ? 'छुट्टी मंज़ूर' : 'छुट्टी नामंज़ूर', `${p.studentName}: ${p.from} – ${p.to}`],
   },
+  at_risk: {
+    kn: (p) => [`ಗಮನಿಸಿ: ${p.studentName}`, p.streak >= 2 ? `ಸತತ ${p.streak} ದಿನ ಗೈರು. ಪೋಷಕರನ್ನು ಸಂಪರ್ಕಿಸಿ.` : `ಹಾಜರಾತಿ ${p.pct}%. ಪೋಷಕರನ್ನು ಸಂಪರ್ಕಿಸಿ.`],
+    en: (p) => [`Follow up: ${p.studentName}`, p.streak >= 2 ? `Absent ${p.streak} days in a row. Contact the parent.` : `Attendance ${p.pct}%. Contact the parent.`],
+    hi: (p) => [`ध्यान दें: ${p.studentName}`, p.streak >= 2 ? `लगातार ${p.streak} दिन अनुपस्थित। अभिभावक से संपर्क करें।` : `हाज़िरी ${p.pct}%। अभिभावक से संपर्क करें।`],
+  },
   absence_reason: {
     kn: (p) => [`${p.studentName}: ಪೋಷಕರ ಉತ್ತರ`, withNote(REASON_WORDS.kn[p.code], p.note)],
     en: (p) => [`${p.studentName}: parent replied`, withNote(REASON_WORDS.en[p.code], p.note)],

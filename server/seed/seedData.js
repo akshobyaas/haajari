@@ -1,5 +1,5 @@
 const { todayIn, addDays, closedReason } = require('../src/utils/dates');
-const { School, User, ClassRoom, Student, Attendance, AuditLog, LeaveRequest, PickupLog, Notification, PushSubscription, GRADES, defaultModeFor } = require('../src/models');
+const { School, User, ClassRoom, Student, Attendance, AuditLog, LeaveRequest, PickupLog, Notification, PushSubscription, RiskFlag, GRADES, defaultModeFor } = require('../src/models');
 
 // Deterministic random numbers so every seed produces the same demo school.
 function rng(seed) {
@@ -28,7 +28,7 @@ const DEMO = {
 };
 
 async function clearAll() {
-  await Promise.all([School, User, ClassRoom, Student, Attendance, AuditLog, LeaveRequest, PickupLog, Notification, PushSubscription].map((M) => M.deleteMany({})));
+  await Promise.all([School, User, ClassRoom, Student, Attendance, AuditLog, LeaveRequest, PickupLog, Notification, PushSubscription, RiskFlag].map((M) => M.deleteMany({})));
 }
 
 async function seed({ log = console.log, days = 40 } = {}) {
@@ -143,7 +143,10 @@ async function seed({ log = console.log, days = 40 } = {}) {
   while (closedReason(school, from)) from = addDays(from, 1);
   await LeaveRequest.create({ schoolId: school._id, studentId: asker._id, from, to: addDays(from, 1), reason: 'Cousin’s wedding in Mandya', requestedBy: asker.parentIds[0] });
 
-  const summary = { school: school.name, classes: classes.length, teachers: teachers.length, students: studentCount, parents: parentSeq - 1, attendanceRecords: marks };
+  // Find children who need follow-up, so the dashboard has them from the start.
+  const risk = await require('../src/workers/risk').evaluateRisk(await School.findById(school._id));
+
+  const summary = { atRisk: risk.flagged, school: school.name, classes: classes.length, teachers: teachers.length, students: studentCount, parents: parentSeq - 1, attendanceRecords: marks };
   log('Seeded:', summary);
   log('Demo logins:');
   log(`  Admin   ${DEMO.adminEmail} / ${DEMO.adminPassword}`);

@@ -24,6 +24,8 @@ function createApp() {
   app.use('/api/attendance', requireAuth, require('./routes/attendance'));
   app.use('/api/leave', requireAuth, require('./routes/leave'));
   app.use('/api/pickup', requireAuth, require('./routes/pickup'));
+  app.use('/api/risk', requireAuth, require('./routes/risk'));
+  app.use('/api/reports', requireAuth, require('./routes/reports'));
   app.use('/api/me', requireAuth, require('./routes/me'));
   app.use('/api/dashboard', requireAuth, requireRole('admin'), require('./routes/dashboard'));
 

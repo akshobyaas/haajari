@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useNavigate, Link } from 'react-router-dom';
-import { CalendarOff, ChevronRight } from 'lucide-react';
+import { CalendarOff, ChevronRight, HeartHandshake, FileSpreadsheet } from 'lucide-react';
 import { api } from '../../lib/api';
 import { useTranslation } from 'react-i18next';
 import { useAuth } from '../../lib/auth';
@@ -20,6 +20,7 @@ export default function TeacherHome() {
   const { data, isLoading, error } = useQuery({ queryKey: ['classes'], queryFn: loadClasses });
   const leave = useQuery({ queryKey: ['leave'], queryFn: () => api.get('/leave', { params: { status: 'pending' } }).then((r) => r.data.leaves) });
   const pendingLeave = (leave.data || []).filter((l) => l.status === 'pending').length;
+  const risk = useQuery({ queryKey: ['risk'], queryFn: () => api.get('/risk').then((r) => r.data.flags) });
   const onPhone = useLiveQuery(
     () => (data?.date ? db.marks.where('synced').equals(0).filter((m) => m.date === data.date).toArray() : []),
     [data?.date],
@@ -66,6 +67,20 @@ export default function TeacherHome() {
         ))}
       </div>
       {data?.classes.length === 0 && <Notice tone="info">{t('teacher.noClasses')}</Notice>}
+      <div className="mt-6 grid gap-3 sm:grid-cols-2">
+        {risk.data?.length > 0 && (
+          <Link to="/t/at-risk" className="flex items-center gap-3 rounded-2xl border border-absent/30 bg-absent/5 px-4 py-3">
+            <HeartHandshake className="size-5 text-absent" />
+            <span className="flex-1 font-semibold">{t('dash.followUpCount', { count: risk.data.length })}</span>
+            <ChevronRight className="size-4 text-muted" />
+          </Link>
+        )}
+        <Link to="/t/reports" className="flex items-center gap-3 rounded-2xl border border-line bg-card px-4 py-3">
+          <FileSpreadsheet className="size-5 text-board" />
+          <span className="flex-1 font-semibold">{t('reports.register')}</span>
+          <ChevronRight className="size-4 text-muted" />
+        </Link>
+      </div>
     </div>
   );
 }

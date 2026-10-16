@@ -1,6 +1,6 @@
 import { NavLink, Outlet } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Home, LayoutGrid, Users, GraduationCap, Settings, CircleUser, WifiOff, Bell, CalendarOff } from 'lucide-react';
+import { Home, LayoutGrid, Users, GraduationCap, Settings, CircleUser, WifiOff, Bell, CalendarOff, FileSpreadsheet, HeartHandshake } from 'lucide-react';
 import { useUnread } from '../pages/Alerts';
 import { useEffect, useState } from 'react';
 import { useAuth } from '../lib/auth';
@@ -9,6 +9,8 @@ import { Notice } from './ui';
 const NAV = {
   admin: [
     { to: '/a', icon: Home, key: 'home', end: true },
+    { to: '/a/at-risk', icon: HeartHandshake, key: 'followUp' },
+    { to: '/a/reports', icon: FileSpreadsheet, key: 'reports' },
     { to: '/a/classes', icon: LayoutGrid, key: 'classes' },
     { to: '/a/students', icon: GraduationCap, key: 'students' },
     { to: '/a/teachers', icon: Users, key: 'teachers' },
@@ -57,7 +59,7 @@ export default function AppShell() {
   return (
     <div className="min-h-dvh lg:flex">
       {/* Sidebar: desktop */}
-      <aside className="chalkboard sticky top-0 hidden h-dvh w-64 shrink-0 flex-col px-4 py-6 lg:flex">
+      <aside className="chalkboard sticky top-0 hidden h-dvh w-64 shrink-0 flex-col px-4 py-6 lg:flex print:hidden">
         <div className="mb-8 flex items-center gap-2 px-2">
           <img src="/icon.svg" alt="" className="size-8" />
           <span className="text-2xl font-bold">{t('app.name')}</span>
@@ -74,17 +76,17 @@ export default function AppShell() {
 
       <div className="flex min-w-0 flex-1 flex-col">
         {!online && (
-          <div className="sticky top-0 z-30 flex items-center justify-center gap-2 bg-ink px-4 py-2 text-sm text-chalk">
+          <div className="sticky top-0 z-30 flex items-center justify-center gap-2 bg-ink px-4 py-2 text-sm text-chalk print:hidden">
             <WifiOff className="size-4" /> {t('common.offline')}
           </div>
         )}
-        <main className="mx-auto w-full max-w-5xl flex-1 px-4 pt-[max(1.25rem,env(safe-area-inset-top))] pb-28 lg:px-8 lg:pt-8 lg:pb-12">
+        <main className="mx-auto w-full max-w-6xl flex-1 print:max-w-none print:p-0 px-4 pt-[max(1.25rem,env(safe-area-inset-top))] pb-28 lg:px-8 lg:pt-8 lg:pb-12">
           <Outlet />
         </main>
       </div>
 
       {/* Bottom bar: phones and tablets */}
-      <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-line bg-card/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden">
+      <nav className="fixed inset-x-0 bottom-0 z-20 border-t border-line bg-card/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden print:hidden">
         <div className="mx-auto flex max-w-md justify-around">
           {bottomItems.map(({ to, icon: Icon, key, end }) => (
             <NavLink key={to} to={to} end={end}

@@ -91,7 +91,11 @@ async function notifyAbsenceCleared(records) {
 
 function startWorkers({ intervalMs = 30_000, log = console.error } = {}) {
   const tick = async () => {
-    try { await runAbsenceAlerts(); await runLatePickupAlerts(); } catch (e) { log('Alert worker:', e.message); }
+    try {
+      await runAbsenceAlerts();
+      await runLatePickupAlerts();
+      await require('./risk').runDailyRisk({ log: console.log });
+    } catch (e) { log('Alert worker:', e.message); }
   };
   const id = setInterval(tick, intervalMs);
   tick();

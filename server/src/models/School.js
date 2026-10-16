@@ -23,6 +23,9 @@ const schoolSchema = new Schema(
     // Pre-primary pickup time; staff are alerted if a child is still waiting this many minutes after it.
     pickupTime: { type: String, default: '12:30' },
     pickupGraceMinutes: { type: Number, default: 20, min: 0, max: 180 },
+    // Classes that get the mid-day meal (PM POSHAN covers pre-primary to Class 8 in government schools).
+    mealGrades: { type: [String], default: ['PREKG', 'LKG', 'UKG', '1', '2', '3', '4', '5', '6', '7', '8'] },
+    riskEvaluatedOn: String, // date of the last at-risk run
     // Teachers may mark or correct this many past days; admins any day.
     teacherBackdateDays: { type: Number, default: 7, min: 0, max: 60 },
   },

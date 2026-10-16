@@ -12,5 +12,6 @@ module.exports = {
   PickupLog: require('./PickupLog'),
   Notification: require('./Notification'),
   PushSubscription: require('./PushSubscription'),
+  RiskFlag: require('./RiskFlag'),
   ...require('./constants'),
 };

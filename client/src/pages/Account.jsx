@@ -3,7 +3,8 @@ import { useTranslation } from 'react-i18next';
 import { db, clearOfflineData } from '../offline/db';
 import { syncNow } from '../offline/sync';
 import { useNavigate } from 'react-router-dom';
-import { LogOut } from 'lucide-react';
+import { LogOut, LayoutGrid, GraduationCap, Users, Settings, ChevronRight } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
 import { useAuth } from '../lib/auth';
 import { prettyPhone } from '../lib/format';
@@ -40,6 +41,16 @@ export default function Account() {
         <span className="font-semibold">{t('lang.choose')}</span>
         <LanguageSwitch />
       </Card>
+      {user.role === 'admin' && (
+        // On phones the bottom bar has room for five; the rest of the office tools live here.
+        <Card className="mb-6 divide-y divide-line/70 lg:hidden">
+          {[['/a/classes', LayoutGrid, 'classes'], ['/a/students', GraduationCap, 'students'], ['/a/teachers', Users, 'teachers'], ['/a/settings', Settings, 'settings']].map(([to, Icon, key]) => (
+            <Link key={to} to={to} className="flex items-center gap-3 px-5 py-3.5 font-semibold">
+              <Icon className="size-5 text-board" /> <span className="flex-1">{t(`nav.${key}`)}</span> <ChevronRight className="size-4 text-muted" />
+            </Link>
+          ))}
+        </Card>
+      )}
       {blocked && <Notice tone="warn" className="mb-4">{t('account.unsynced')}</Notice>}
       <Button variant="quiet" className="w-full" onClick={logOut}>
         <LogOut className="size-5" /> {t('common.logOut')}

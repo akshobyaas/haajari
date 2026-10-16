@@ -2,12 +2,13 @@
 
 MERN web app for Karnataka government schools, Pre-KG to Class 10. Kannada first, also English and Hindi.
 
-**Status: Phases 1–3 complete.**
+**Status: Phases 1–4 complete.**
 - Phase 1, Foundation: login, roles, school setup, classes, students, spreadsheet import, three languages.
 - Phase 2, Offline marking: one-tap marking that works with no internet and syncs later with no duplicates.
 - Phase 3, Parents and pre-primary: absence alerts with one-tap replies, leave requests, LKG–UKG arrival and pickup with QR passes.
+- Phase 4, Insights: live dashboard, emergency headcount, mid-day meal count, children to follow up, monthly register (print/PDF and Excel), shortage list, SATS export.
 
-Next: Phase 4, dashboards, at-risk flags, mid-day meal count and reports.
+Next: Phase 5, polish, field test on a low-cost phone, deployment and the demo.
 
 ## Run it on your computer
 
@@ -68,7 +69,7 @@ Teachers are `9000000001` (Pre-KG) to `9000000013` (Class 10), all PIN `1234`.
 npm test
 ```
 
-40 API tests cover login (email, PIN, OTP setup), role access, spreadsheet import, alerts, leave, pickup and attendance:
+50 API tests cover login (email, PIN, OTP setup), role access, spreadsheet import, alerts, leave, pickup and attendance:
 replaying the same offline batch adds nothing, an older offline mark never overwrites a newer one,
 late edits need a reason and are audited, subject teachers mark only their periods, future dates,
 Sundays and holidays are refused, and a class of 40 saves in one request.
@@ -83,12 +84,14 @@ server/                 Node + Express + MongoDB API
   src/middleware/       JWT auth, role checks, class/student access rules
   src/utils/            OTP, spreadsheet import, validation
   src/services/         attendance saving (idempotent), leave, notifications, Web Push
-  src/workers/          absence and late-pickup alerts (every 30 seconds)
+  src/workers/          absence and late-pickup alerts (every 30 s), at-risk check (daily 17:00)
+  src/services/stats.js day overview, trend, monthly register; excel.js for downloads
   seed/                 demo school: KPS Hebbal, Mysuru — 13 classes, 389 students, 40 days of attendance
   tests/                Jest + Supertest
 client/                 React + Vite + Tailwind
   src/pages/            Login, Setup (OTP + PIN), Alerts, teacher/ (MarkAttendance, ClassHistory,
-                        PickupBoard, LeaveInbox), parent/ (Home, Child), admin/
+                        PickupBoard, LeaveInbox), parent/ (Home, Child), admin/ (Dashboard),
+                        AtRisk, Reports, InSchool
   src/sw.js             service worker: offline start, notifications with reply buttons
   src/offline/          IndexedDB storage and the sync queue
   src/components/       PinPad, ClassSlate, AppShell, Sheet, ...
@@ -145,7 +148,24 @@ How it works:
   enough for a cheap phone camera. The server checks the signature; the teacher compares the photo before handing over.
 - SMS or WhatsApp for parents without smartphones plugs into `server/src/services/notify.js`.
 
-## API (Phases 1–3)
+## Phase 4 — what it solves
+
+| Research issue | How Phase 4 handles it |
+| --- | --- |
+| #7 Data lag; no headcount in an emergency | Live dashboard (refreshes every 30 s): children in school now, registers taken with a Call button for classes still pending, class-wise % today, last 30 school days. "Who is in school now" lists every child present and not yet gone home, class by class, printable for drills. |
+| #10 Children at risk go unnoticed | Every evening (17:00) the server flags children absent 3+ school days in a row or below 75% this month or year (both set in School settings). The class teacher is alerted, can call or WhatsApp the parent from the list, and records what was done: called, home visit, message. Flags clear when the child is back. |
+| #11 SATS double entry | SATS export: one row per child with SATS ID, class, working days and days present for the month (Excel or CSV). |
+| #14 Mid-day meal count | Plates to cook = children present today in Pre-KG to Class 8 (configurable), by class, with a "Send to cook" button that shares the count on WhatsApp. |
+| Paper register | Monthly register in the paper layout: P / A / L / Lv per day, holidays shaded, totals per child and per day. Print or save as PDF from the browser (Kannada prints correctly), or download Excel. |
+
+**Gate check (passed):** for 4-A, every total in the monthly register (working days, present, absent and leave days, each child's
+row, each day's column) matches an independent count of the raw attendance records, cell by cell, and the Excel file carries the
+same totals (`server/tests/reports.test.js`).
+
+The SATS export holds the fields SATS asks for, but the portal's exact upload layout is not public, so check the columns
+against the current SATS screen before relying on it.
+
+## API (Phases 1–4)
 
 | Method | Endpoint | Who |
 | --- | --- | --- |
@@ -173,4 +193,9 @@ How it works:
 | POST/GET/PATCH/DELETE | /api/leave | Parent applies, class teacher decides |
 | GET | /api/pickup/class/:id/today | Pre-primary board |
 | POST | /api/pickup/checkout, /undo | Hand over by photo or QR pass |
+| GET | /api/dashboard/today, /trend | Admin: live day, last 30 school days |
+| GET/POST | /api/risk, /api/risk/:id/follow-up, /api/risk/refresh | Children to follow up |
+| GET | /api/reports/register?classId=&month=&format=xlsx | Monthly register |
+| GET | /api/reports/shortage?threshold=&format=xlsx | Below-threshold list |
+| GET | /api/reports/sats?month=&format=xlsx\|csv | SATS summary |
 | GET | /api/dashboard/summary | Admin |
