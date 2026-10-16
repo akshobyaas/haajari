@@ -1,0 +1,15 @@
+{
+  "name": "haajari",
+  "private": true,
+  "scripts": {
+    "setup": "npm install && npm --prefix server install && npm --prefix client install",
+    "dev": "concurrently -n api,app -c green,yellow \"npm --prefix server run dev:memory\" \"npm --prefix client run dev\"",
+    "dev:mongo": "concurrently -n api,app -c green,yellow \"npm --prefix server run dev\" \"npm --prefix client run dev\"",
+    "seed": "npm --prefix server run seed",
+    "test": "npm --prefix server test",
+    "demo": "npm --prefix client run build && concurrently -n api,app -c green,yellow \"npm --prefix server run dev:memory\" \"npm --prefix client run preview\""
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.0"
+  }
+}

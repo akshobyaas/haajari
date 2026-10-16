@@ -1,0 +1,48 @@
+@import 'tailwindcss';
+@import '@fontsource-variable/baloo-tamma-2';
+@import '@fontsource-variable/baloo-2';
+
+/* Haajari tokens: a school blackboard, chalk, and the colours of the paper register. */
+@theme {
+  --color-board: #1e4a3b;        /* blackboard green: brand, primary actions */
+  --color-board-deep: #153629;
+  --color-chalk: #f4f7f2;        /* text on the board */
+  --color-paper: #eef2ef;        /* app background */
+  --color-card: #ffffff;
+  --color-ink: #13261e;          /* body text */
+  --color-muted: #5a6d64;
+  --color-line: #d3ddd7;
+  --color-present: #2e8b57;
+  --color-absent: #c2362b;       /* kumkum red */
+  --color-late: #d9951a;         /* marigold */
+  --color-leave: #3f62ad;        /* register ink blue */
+
+  --font-sans: 'Baloo Tamma 2 Variable', 'Baloo 2 Variable', 'Noto Sans Kannada', system-ui, sans-serif;
+
+  --radius-slate: 1.25rem;
+  --shadow-lift: 0 1px 0 rgb(19 38 30 / 0.06), 0 8px 24px -12px rgb(19 38 30 / 0.25);
+}
+
+@layer base {
+  html { -webkit-tap-highlight-color: transparent; }
+  body {
+    @apply bg-paper text-ink font-sans antialiased;
+    font-size: 17px;
+    line-height: 1.5;
+  }
+  :focus-visible { outline: 3px solid var(--color-late); outline-offset: 2px; border-radius: 6px; }
+  input, select, textarea, button { font: inherit; }
+}
+
+/* Chalk texture on board-coloured surfaces: two faint radial smudges. */
+.chalkboard {
+  background-color: var(--color-board);
+  background-image:
+    radial-gradient(120% 80% at 10% 0%, rgb(255 255 255 / 0.07), transparent 60%),
+    radial-gradient(80% 60% at 100% 100%, rgb(0 0 0 / 0.18), transparent 70%);
+  color: var(--color-chalk);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
+}
