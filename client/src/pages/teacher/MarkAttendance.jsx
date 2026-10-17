@@ -55,11 +55,14 @@ export default function MarkAttendance() {
   const [done, setDone] = useState(null);
 
   // What is saved, per student: phone row wins over the server copy (it is newer or equal).
-  const { saved, syncOf, noteOf, leaveOnly } = useMemo(() => {
+  const { saved, syncOf, noteOf, leaveOnly, onLeave } = useMemo(() => {
     const savedMap = {};
     const sync = {};
     const notes = {};
     const fromLeave = {};
+    // Children with approved leave today (in any period) start as Leave instead of Present.
+    const leaveDay = {};
+    (r?.marks || []).forEach((m) => { if (m.source === 'leave') leaveDay[m.studentId] = true; });
     (r?.marks || []).filter((m) => m.period === period).forEach((m) => {
       savedMap[m.studentId] = m.status;
       sync[m.studentId] = 'server';
@@ -68,14 +71,16 @@ export default function MarkAttendance() {
     });
     localRows.forEach((m) => { savedMap[m.studentId] = m.status; sync[m.studentId] = m.synced ? 'server' : 'phone'; });
     localRows.forEach((m) => { delete fromLeave[m.studentId]; });
-    return { saved: savedMap, syncOf: sync, noteOf: notes, leaveOnly: fromLeave };
+    Object.keys(leaveDay).forEach((sid) => { if (!notes[sid]) notes[sid] = t('mark.onLeave'); });
+    return { saved: savedMap, syncOf: sync, noteOf: notes, leaveOnly: fromLeave, onLeave: leaveDay };
   }, [r, localRows, period, t]);
 
   const students = r?.students || [];
   // Approved leave fills some days in advance; the register still counts as not taken.
   const firstSave = students.length > 0 && students.every((s) => saved[s._id] === undefined || leaveOnly[s._id]);
-  const statusOf = (sid) => draft[sid] ?? saved[sid] ?? 'P';
-  const changed = students.filter((s) => draft[s._id] !== undefined && draft[s._id] !== (saved[s._id] ?? 'P'));
+  const startOf = (sid) => (onLeave[sid] ? 'LV' : 'P');
+  const statusOf = (sid) => draft[sid] ?? saved[sid] ?? startOf(sid);
+  const changed = students.filter((s) => draft[s._id] !== undefined && draft[s._id] !== (saved[s._id] ?? startOf(s._id)));
   const counts = students.reduce((acc, s) => ({ ...acc, [statusOf(s._id)]: acc[statusOf(s._id)] + 1 }), { P: 0, A: 0, L: 0, LV: 0 });
   const errorRows = localRows.filter((m) => m.error);
   const needsReasonErr = errorRows.some((m) => m.error === 'needs_reason');
@@ -84,7 +89,8 @@ export default function MarkAttendance() {
   const closed = r && (r.closed || (r.school && isClosed(r.school, theDate)));
 
   const setStatus = (sid, st) => setDraft((d) => ({ ...d, [sid]: st }));
-  const allPresent = () => setDraft(Object.fromEntries(students.map((s) => [s._id, 'P'])));
+  // "All present" keeps children on approved leave as Leave.
+  const allPresent = () => setDraft(Object.fromEntries(students.map((s) => [s._id, startOf(s._id)])));
 
   const doSave = async (editReason) => {
     const statuses = firstSave
@@ -180,7 +186,7 @@ export default function MarkAttendance() {
       {roster.isLoading && <div className="space-y-1">{Array.from({ length: 10 }, (_, i) => <Skeleton key={i} className="h-16" />)}</div>}
       <ul className="divide-y divide-line/70 overflow-hidden rounded-2xl border border-line bg-card lg:grid lg:grid-cols-2 lg:divide-y-0 lg:[&>li]:border-b lg:[&>li]:border-b-line/70">
         {students.map((s) => {
-          const isDraft = draft[s._id] !== undefined && draft[s._id] !== (saved[s._id] ?? 'P');
+          const isDraft = draft[s._id] !== undefined && draft[s._id] !== (saved[s._id] ?? startOf(s._id));
           return (
             <StudentRow key={s._id} student={s} status={statusOf(s._id)} disabled={Boolean(closed)}
               sync={isDraft ? 'draft' : syncOf[s._id] || null}

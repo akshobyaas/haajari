@@ -120,6 +120,23 @@ describe('leave requests', () => {
   });
 });
 
+describe('leave in a period-wise class', () => {
+  test('approved leave marks every period, so no subject teacher starts the child as present', async () => {
+    const { applyLeave } = require('../src/services/leave');
+    const ten = await ClassRoom.findOne({ grade: '10' });
+    const child = await Student.findOne({ classId: ten._id });
+    let day = addDays(today, 1);
+    while (closedReason({ holidays: [] }, day)) day = addDays(day, 1);
+    await Attendance.deleteMany({ studentId: child._id, date: day });
+    const hm = await User.findOne({ role: 'admin' });
+    const n = await applyLeave({ schoolId: ten.schoolId, studentId: child._id, from: day, to: day, reason: 'Fever' }, hm);
+    expect(n).toBe(ten.periodsPerDay);
+    const recs = await Attendance.find({ studentId: child._id, date: day }).sort({ period: 1 });
+    expect(recs.map((r) => r.period)).toEqual(Array.from({ length: ten.periodsPerDay }, (_, i) => i + 1));
+    expect(recs.every((r) => r.status === 'LV' && r.source === 'leave')).toBe(true);
+  });
+});
+
 describe('pre-primary pickup', () => {
   let lkg, child, lkgTeacher, childParent, guardian;
   beforeAll(async () => {

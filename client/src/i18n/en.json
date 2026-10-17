@@ -241,7 +241,7 @@
     "today": "Today",
     "day": "Day",
     "period": "Period {{n}}",
-    "hint": "Everyone starts as present (P). Tap A for absent, L for late, Lv for leave.",
+    "hint": "Everyone starts as present (P), children on approved leave as Lv. Tap A for absent, L for late.",
     "save": "Save attendance",
     "saveChanges": "Save {{count}} changes",
     "saveChanges_one": "Save 1 change",
@@ -270,7 +270,8 @@
     "offlineRoster": "No internet. Using the class list saved on this phone.",
     "noRoster": "This class has not been opened on this phone yet. Connect to the internet once to download it.",
     "prev": "Previous day",
-    "next": "Next day"
+    "next": "Next day",
+    "onLeave": "Leave approved"
   },
   "sync": {
     "pending": "{{count}} marks waiting to send",
