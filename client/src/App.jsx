@@ -26,6 +26,8 @@ const Classes = lazy(() => import('./pages/admin/Classes'));
 const Students = lazy(() => import('./pages/admin/Students'));
 const Teachers = lazy(() => import('./pages/admin/Teachers'));
 const Settings = lazy(() => import('./pages/admin/Settings'));
+const RegisterSchool = lazy(() => import('./pages/RegisterSchool'));
+const OfficeSchools = lazy(() => import('./pages/office/Schools'));
 
 function Guard({ role, children }) {
   const user = useAuth((s) => s.user);
@@ -50,6 +52,7 @@ export default function App() {
       <Routes>
         <Route path="/login" element={user ? <Navigate to={homeFor(user.role)} replace /> : <Login />} />
         <Route path="/setup" element={<Setup />} />
+        <Route path="/register-school" element={<RegisterSchool />} />
         {/* Full-screen, no navigation bar: nothing to tap by mistake while marking. */}
         <Route path="/t/class/:id/mark" element={<Guard role="teacher"><MarkAttendance /></Guard>} />
         <Route path="/t/class/:id/pickup" element={<Guard role="teacher"><PickupBoard /></Guard>} />
@@ -72,6 +75,7 @@ export default function App() {
           <Route path="/a/students" element={<Guard role="admin"><Students /></Guard>} />
           <Route path="/a/teachers" element={<Guard role="admin"><Teachers /></Guard>} />
           <Route path="/a/settings" element={<Guard role="admin"><Settings /></Guard>} />
+          <Route path="/o" element={<Guard role="superadmin"><OfficeSchools /></Guard>} />
         </Route>
         <Route path="*" element={<Navigate to={user ? homeFor(user.role) : '/login'} replace />} />
       </Routes>

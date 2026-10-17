@@ -25,6 +25,8 @@ const DEMO = {
   teacherPhone: '9000000007', // Smt. Rekha Kulkarni, class teacher of 4-A
   parentPhone: '9100000001',
   pin: '1234',
+  approverEmail: 'office@haajari.in', // block office: approves and adds schools
+  approverPassword: 'Haajari@2026',
 };
 
 async function clearAll() {
@@ -147,11 +149,21 @@ async function seed({ log = console.log, days = 40 } = {}) {
   const risk = await require('../src/workers/risk').evaluateRisk(await School.findById(school._id));
 
   const summary = { atRisk: risk.flagged, school: school.name, classes: classes.length, teachers: teachers.length, students: studentCount, parents: parentSeq - 1, attendanceRecords: marks };
+  // The block office (approver) and one school waiting for approval, for the demo.
+  await require('../src/utils/approver').ensureApprover({ email: DEMO.approverEmail, password: DEMO.approverPassword, name: 'BEO Office, Mysuru North' });
+  await require('../src/services/schools').createSchool({
+    school: { name: 'Government Higher Primary School, Kuvempunagar', udiseCode: '29261200245', district: 'Mysuru', block: 'Mysuru North' },
+    hm: { name: 'Smt. Lakshmi Devi', email: 'hm@ghps-kuvempunagar.in', phone: '9300000001', password: 'Haajari@2026' },
+    note: 'We have 6 classes and about 180 children.',
+    status: 'pending',
+  });
+
   log('Seeded:', summary);
   log('Demo logins:');
   log(`  Admin   ${DEMO.adminEmail} / ${DEMO.adminPassword}`);
   log(`  Teacher ${DEMO.teacherPhone} / PIN ${DEMO.pin}  (class teacher, 4-A)`);
   log(`  Parent  ${DEMO.parentPhone} / PIN ${DEMO.pin}  (Riya S, 4-A)`);
+  log(`  Approver ${DEMO.approverEmail} / ${DEMO.approverPassword}  (block office: approves schools)`);
   return { summary, DEMO };
 }
 

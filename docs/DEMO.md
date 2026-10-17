@@ -18,7 +18,7 @@ Two screens side by side: a laptop (headmaster) and a phone or a narrow browser 
 | --- | --- | --- |
 | 0:00 | Show the research table in the plan doc. | "We read news reports and teacher complaints from Punjab, MP, Bihar, UP and Karnataka. Apps fail because of slow servers at 9 a.m., poor network, and fiddly screens; Karnataka also dropped face recognition over privacy. 15 problems; every feature answers one." **(Data collection)** |
 | 0:40 | Show the architecture diagram. | "MERN. The phone saves marks first and syncs later; the server ignores repeats. No GPS, no face data." **(Design)** |
-| 1:10 | Phone: turn on airplane mode. Open 4-A. Tap 3 children (absent), one twice (late). Save. | "Everyone starts present; 40 children, 5 taps. No network: it says saved on this phone." |
+| 1:10 | Phone: turn on airplane mode. Open 4-A. Tap **A** for 3 children and **L** for one. Save. | "Everyone starts present; 40 children, 5 taps. Each child has P, A, L and Lv, the register's own letters, so one tap sets any status. No network: it says saved on this phone." |
 | 1:50 | Turn airplane mode off. Ticks appear. Laptop: dashboard updates (4-A now counted). | "Synced in the background. If the phone sends twice, the server keeps one copy; we tested 50 classes sending at once, twice." **(Implementation)** |
 | 2:30 | Parent phone: Alerts. Riya is absent. Tap **Sick**. | "Parents hear within about 2 minutes. The delay means a mis-tap the teacher fixes never alarms anyone." |
 | 3:00 | Teacher phone: open 4-A again; *Sick* shows under Riya's name. | "The reason reaches the teacher; no phone calls needed." |
@@ -27,6 +27,7 @@ Two screens side by side: a laptop (headmaster) and a phone or a narrow browser 
 | 4:30 | Laptop: **Follow-up**. Open one child. Click *Visited home*, type a note, save. | "Children absent 3 days in a row or below 75% are flagged every evening, like Delhi's early-warning programme." |
 | 5:00 | Laptop: **Reports** → monthly register for 4-A → Print preview. Then SATS export. | "This is the paper register, filled in. Totals are checked against the raw data in our tests. The SATS file saves double entry." |
 | 5:30 | Optional: LKG teacher `9000000002`, scan the parent's QR pickup pass. | "For LKG and UKG, children are handed only to people on the parent's list." |
+| 5:30 | Optional, instead: laptop, log out, log in as `office@haajari.in`. **Schools → Requests**: approve GHPS Kuvempunagar. Log in as `hm@ghps-kuvempunagar.in`: an empty school with *Set up your school*. | "Schools apply and the block office approves them. One deployment serves the whole block, and each school sees only its own children." |
 | 5:50 | Switch the phone to English and back to Kannada. | "Kannada first, also English and Hindi." **(Demonstration)** |
 
 ## Likely viva questions

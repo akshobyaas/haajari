@@ -23,7 +23,13 @@ api.interceptors.response.use(
 // The server writes user-facing messages; fall back to a translated one.
 export function errorMessage(err) {
   if (!err?.response) return i18n.t('errors.network');
-  return err.response.data?.error?.message || i18n.t('errors.generic');
+  const e = err.response.data?.error;
+  // Known cases get a translated message; the rest show the server's own words.
+  if (e?.code && i18n.exists(`errors.${e.code}`)) {
+    const msg = i18n.t(`errors.${e.code}`);
+    return e.details?.reason ? `${msg} ${i18n.t('office.reason', { reason: e.details.reason })}` : msg;
+  }
+  return e?.message || i18n.t('errors.generic');
 }
 
 export const errorDetails = (err) => err?.response?.data?.error?.details || {};

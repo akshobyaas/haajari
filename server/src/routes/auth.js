@@ -1,6 +1,7 @@
 const { Router } = require('express');
 const rateLimit = require('express-rate-limit');
-const { User } = require('../models');
+const { User, School } = require('../models');
+const { assertSchoolOpen } = require('../utils/schoolStatus');
 const env = require('../config/env');
 const otp = require('../utils/otp');
 const { signAuth, signSetup, verify } = require('../utils/token');
@@ -20,6 +21,7 @@ const loginLimiter = rateLimit({
 });
 
 const session = async (user) => {
+  await assertSchoolOpen(user, School);
   user.lastLoginAt = new Date();
   await user.save();
   return { token: signAuth(user), user: user.toPublic() };

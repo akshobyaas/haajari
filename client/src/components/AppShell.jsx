@@ -1,7 +1,7 @@
 import { NavLink, Outlet, useLocation } from 'react-router-dom';
 import ErrorBoundary from './ErrorBoundary';
 import { useTranslation } from 'react-i18next';
-import { Home, LayoutGrid, Users, GraduationCap, Settings, CircleUser, WifiOff, Bell, CalendarOff, FileSpreadsheet, HeartHandshake } from 'lucide-react';
+import { Building2, Home, LayoutGrid, Users, GraduationCap, Settings, CircleUser, WifiOff, Bell, CalendarOff, FileSpreadsheet, HeartHandshake } from 'lucide-react';
 import { useUnread } from '../lib/notifications';
 import { Suspense, useEffect, useState } from 'react';
 import { useAuth } from '../lib/auth';
@@ -21,6 +21,10 @@ const NAV = {
     { to: '/t', icon: Home, key: 'home', end: true },
     { to: '/t/leave', icon: CalendarOff, key: 'leave' },
     { to: '/alerts', icon: Bell, key: 'alerts' },
+    { to: '/account', icon: CircleUser, key: 'account' },
+  ],
+  superadmin: [
+    { to: '/o', icon: Building2, key: 'schools', end: true },
     { to: '/account', icon: CircleUser, key: 'account' },
   ],
   parent: [

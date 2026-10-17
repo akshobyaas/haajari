@@ -50,7 +50,8 @@
     "leave": "Leave",
     "reports": "Reports",
     "followUp": "Follow-up",
-    "more": "More"
+    "more": "More",
+    "schools": "Schools"
   },
   "common": {
     "save": "Save",
@@ -228,7 +229,11 @@
   },
   "errors": {
     "network": "Could not reach the server. Check the internet and try again.",
-    "generic": "Something went wrong. Try again."
+    "generic": "Something went wrong. Try again.",
+    "school_pending": "Your school is waiting for approval. You can log in once the block office approves it.",
+    "school_rejected": "Your school's request was not approved.",
+    "udise_taken": "This UDISE code is already registered or waiting for approval.",
+    "hm_taken": "This email or mobile number is already used by another account."
   },
   "status": {
     "P": "Present",
@@ -449,5 +454,64 @@
     "A": "A",
     "L": "L",
     "LV": "Lv"
+  },
+  "register": {
+    "link": "New school? Register your school",
+    "title": "Register your school",
+    "sub": "The block office checks every request. You can log in once it is approved.",
+    "schoolSection": "School",
+    "hmSection": "Headmaster (your login)",
+    "name": "School name",
+    "udise": "UDISE code",
+    "udiseHint": "11 digits, on the school's UDISE+ certificate",
+    "district": "District",
+    "block": "Block",
+    "hmName": "Your name",
+    "email": "Email",
+    "phone": "Mobile number",
+    "password": "Password",
+    "passwordHint": "At least 8 characters",
+    "note": "Anything the approver should know (optional)",
+    "submit": "Send request",
+    "sentTitle": "Request sent",
+    "sentBody": "{{name}} is waiting for approval. Once it is approved, log in with {{email}} on the School office tab.",
+    "backToLogin": "Back to login"
+  },
+  "office": {
+    "title": "Schools",
+    "sub": "Approve new schools and see how every school is doing today.",
+    "tabRequests": "Requests",
+    "tabSchools": "Schools",
+    "add": "Add a school",
+    "noRequests": "No requests waiting.",
+    "requested": "Asked on {{date}}",
+    "approve": "Approve",
+    "reject": "Turn down",
+    "rejectReason": "Why? The headmaster sees this.",
+    "confirmReject": "Turn down",
+    "approved": "{{name}} is approved. The headmaster can log in now.",
+    "rejected": "Request turned down.",
+    "addTitle": "Add a school",
+    "addSub": "For schools the office brings on itself. It is active at once.",
+    "added": "{{name}} added. Share the login with the headmaster.",
+    "size": "{{classes}} classes · {{students}} children",
+    "today": "Today: {{taken}} of {{classes}} registers · {{pct}}% present",
+    "todayNone": "Today: no register taken yet",
+    "todayClosed": "Closed today: {{reason}}",
+    "notSetUp": "Not set up yet: no classes",
+    "statusPending": "Waiting",
+    "statusActive": "Active",
+    "statusRejected": "Turned down",
+    "totals": "Active: {{active}} · Waiting: {{pending}}",
+    "head": "Headmaster",
+    "reason": "Reason: {{reason}}"
+  },
+  "start": {
+    "title": "Set up your school",
+    "sub": "Four steps, then your teachers can start marking.",
+    "s1": "Check school settings: timings and holidays",
+    "s2": "Add classes",
+    "s3": "Add teachers",
+    "s4": "Add students (import a spreadsheet)"
   }
 }

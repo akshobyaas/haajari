@@ -39,6 +39,9 @@ export default function Login() {
           </div>
           {tab === 'phone' ? <PhoneLogin /> : <StaffLogin />}
         </div>
+        <p className="mt-5 text-center text-[15px]">
+          <Link to="/register-school" className="font-semibold text-board-text underline underline-offset-4">{t('register.link')}</Link>
+        </p>
       </main>
     </div>
   );

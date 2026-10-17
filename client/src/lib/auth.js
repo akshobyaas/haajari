@@ -20,4 +20,4 @@ export const useAuth = create((set) => ({
   },
 }));
 
-export const homeFor = (role) => ({ admin: '/a', teacher: '/t', parent: '/p' }[role] || '/login');
+export const homeFor = (role) => ({ admin: '/a', teacher: '/t', parent: '/p', superadmin: '/o' }[role] || '/login');

@@ -6,8 +6,23 @@ const { verify } = require('../utils/token');
 const { vapidKeys } = require('../services/push');
 const { unauthorized, notFound } = require('../utils/errors');
 const { recordParentReason } = require('./me');
+const env = require('../config/env');
+const { createSchool } = require('../services/schools');
+const { schoolRequestSchema } = require('./schoolRequestSchema');
 
 const router = Router();
+
+// A headmaster asks to put their school on Haajari. It waits as 'pending' until the approver accepts it.
+const requestLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000,
+  limit: env.isProd ? 5 : 1000,
+  message: { error: { code: 'rate_limited', message: 'Too many requests from this network. Try again in an hour.' } },
+});
+router.post('/school-requests', requestLimiter, async (req, res) => {
+  const body = parse(schoolRequestSchema, req.body);
+  const school = await createSchool({ ...body, status: 'pending' });
+  res.status(201).json({ school: { id: school._id, name: school.name, status: school.status } });
+});
 
 router.get('/push/key', (_req, res) => res.json({ publicKey: vapidKeys().publicKey }));
 

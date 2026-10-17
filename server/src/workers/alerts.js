@@ -1,3 +1,4 @@
+const { ACTIVE } = require('../utils/schoolStatus');
 const { School, Attendance, ClassRoom, Student, User, PickupLog } = require('../models');
 const { notify } = require('../services/notify');
 const { signAbsenceReply } = require('../utils/token');
@@ -28,7 +29,7 @@ async function alertParentsOfAbsence(record, cls, student) {
  */
 async function runAbsenceAlerts({ now = new Date() } = {}) {
   let sent = 0;
-  for (const school of await School.find()) {
+  for (const school of await School.find(ACTIVE)) {
     const today = todayIn(school.timezone, now);
     const cutoff = new Date(now.getTime() - school.alertDelayMinutes * 60 * 1000);
     const classes = await ClassRoom.find({ schoolId: school._id, active: true });
@@ -53,7 +54,7 @@ async function runAbsenceAlerts({ now = new Date() } = {}) {
 /** Pre-primary: tells the class teacher and the office about children still waiting after pickup time. */
 async function runLatePickupAlerts({ now = new Date() } = {}) {
   let sent = 0;
-  for (const school of await School.find()) {
+  for (const school of await School.find(ACTIVE)) {
     const late = minutesOf(nowTimeIn(school.timezone, now)) - minutesOf(school.pickupTime);
     if (late < school.pickupGraceMinutes) continue;
     const today = todayIn(school.timezone, now);

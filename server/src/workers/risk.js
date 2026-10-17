@@ -1,3 +1,4 @@
+const { ACTIVE } = require('../utils/schoolStatus');
 const { Attendance, ClassRoom, Student, RiskFlag, User, School } = require('../models');
 const { notify } = require('../services/notify');
 const { todayIn, nowTimeIn } = require('../utils/dates');
@@ -67,7 +68,7 @@ async function evaluateRisk(school, today = todayIn(school.timezone), { log = ()
 
 /** Runs once a day after school (17:00), and once at start-up if it has never run. */
 async function runDailyRisk({ now = new Date(), log } = {}) {
-  for (const school of await School.find()) {
+  for (const school of await School.find(ACTIVE)) {
     const today = todayIn(school.timezone, now);
     if (school.riskEvaluatedOn === today) continue;
     if (school.riskEvaluatedOn && nowTimeIn(school.timezone, now) < '17:00') continue;

@@ -9,7 +9,8 @@ const subjectAssignment = new Schema(
 
 const userSchema = new Schema(
   {
-    schoolId: { type: Schema.Types.ObjectId, ref: 'School', required: true, index: true },
+    // Every account belongs to one school, except the approver (superadmin), who looks after all of them.
+    schoolId: { type: Schema.Types.ObjectId, ref: 'School', index: true, required() { return this.role !== 'superadmin'; } },
     name: { type: String, required: true, trim: true },
     role: { type: String, enum: ROLES, required: true },
     phone: { type: String, trim: true }, // 10-digit Indian mobile

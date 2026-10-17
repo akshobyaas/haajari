@@ -1,6 +1,7 @@
-const { User } = require('../models');
+const { User, School } = require('../models');
 const { verify } = require('../utils/token');
 const { unauthorized, forbidden } = require('../utils/errors');
+const { assertSchoolOpen } = require('../utils/schoolStatus');
 
 // Attaches req.user (a full User document) when a valid Bearer token is sent.
 async function requireAuth(req, _res, next) {
@@ -16,6 +17,7 @@ async function requireAuth(req, _res, next) {
   if (payload.purpose) return next(unauthorized());
   const user = await User.findById(payload.sub).select('+pinHash');
   if (!user || !user.active) return next(unauthorized('This account is no longer active.'));
+  try { await assertSchoolOpen(user, School); } catch (e) { return next(e); }
   req.user = user;
   next();
 }

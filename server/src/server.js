@@ -11,6 +11,9 @@ const { startWorkers } = require('./workers/alerts');
       console.log('Empty database: loading the demo school...');
       await require('../seed/seedData').seed();
     }
+    await require('./utils/approver').ensureApprover({
+      email: process.env.SUPERADMIN_EMAIL, password: process.env.SUPERADMIN_PASSWORD, name: process.env.SUPERADMIN_NAME,
+    });
     createApp().listen(env.port, () => console.log(`Haajari API on http://localhost:${env.port}`));
     startWorkers();
   } catch (err) {

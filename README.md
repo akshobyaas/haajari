@@ -63,6 +63,8 @@ npm start          # one server: API + app on http://localhost:5000 (needs MONGO
 | Who | Login | Password / PIN |
 | --- | --- | --- |
 | Headmaster (admin) | School office tab: `hm@kps-mysuru.in` | `Haajari@2026` |
+| Block office (approves and adds schools) | School office tab: `office@haajari.in` | `Haajari@2026` |
+| Headmaster of a school waiting for approval | School office tab: `hm@ghps-kuvempunagar.in` | `Haajari@2026` (refused until approved) |
 | Teacher, class teacher of 4-A (40 children) | `9000000007` | PIN `1234` |
 | Teacher of Class 10 (period-wise marking) | `9000000013` | PIN `1234` |
 | Parent of Riya S (4-A) | `9100000001` | PIN `1234` |
@@ -71,6 +73,21 @@ npm start          # one server: API + app on http://localhost:5000 (needs MONGO
 | Parent of an LKG child (pickup pass) | `9100000016` | Set up a PIN first (OTP shown on screen) |
 
 Teachers are `9000000001` (Pre-KG) to `9000000013` (Class 10), all PIN `1234`.
+
+## Adding schools
+
+Every record carries its school, and every screen shows only the user's own school, so one deployment serves many schools.
+
+1. A headmaster opens **New school? Register your school** on the login page and fills in the school (name, 11-digit UDISE code,
+   district, block) and their own login (name, email, mobile, password). The school waits as *pending*; logging in says so.
+2. The block office (approver) logs in and opens **Schools → Requests**: approve, or turn down with a reason the headmaster sees
+   when they try to log in. A turned-down headmaster can apply again with the same email.
+3. The approver can also **Add a school** directly (active at once), for schools the office brings on itself.
+4. After approval the headmaster sees **Set up your school**: settings, classes, teachers, students (spreadsheet import).
+5. **Schools** also shows every school's register for today: registers taken out of classes, and % present.
+
+The same UDISE code cannot be registered twice, nor the same email or mobile. The approver account comes from the seed
+(`office@haajari.in`) or, on a live site, from the `SUPERADMIN_EMAIL` and `SUPERADMIN_PASSWORD` settings (see docs/DEPLOY.md).
 
 ## Tests
 

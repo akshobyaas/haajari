@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import { Phone, Soup, Siren, ChevronRight, AlertCircle, CheckCircle2, Send, HeartHandshake } from 'lucide-react';
+import { Phone, Soup, Siren, ChevronRight, AlertCircle, CheckCircle2, Send, HeartHandshake, Settings as SettingsIcon, LayoutGrid, Users, GraduationCap } from 'lucide-react';
 import { api } from '../../lib/api';
 import { classLabel, gradeShort, firstName } from '../../lib/format';
 import { fmtDay, fmtTime } from '../../lib/dates';
@@ -46,6 +46,8 @@ export default function Dashboard() {
         </div>
       </div>
       {today.isError && <Notice tone="error" className="mb-4">{t('errors.network')}</Notice>}
+      {summary.data && d && d.classes.length === 0 && <GettingStarted summary={summary.data} />}
+      {d && d.classes.length === 0 ? null : (<>
       {d?.closed && <Notice tone="info" className="mb-4">{t('dash.closed', { reason: d.closed })}</Notice>}
 
       {/* Headline: who is here right now, and how many registers are in */}
@@ -166,6 +168,38 @@ export default function Dashboard() {
           ))}
         </Card>
       )}
+      </>)}
     </div>
+  );
+}
+
+// A school that was just approved has nothing in it yet: show the four steps to get going.
+function GettingStarted({ summary }) {
+  const { t } = useTranslation();
+  const steps = [
+    { to: '/a/settings', icon: SettingsIcon, label: t('start.s1'), done: false },
+    { to: '/a/classes', icon: LayoutGrid, label: t('start.s2'), done: summary.classes > 0 },
+    { to: '/a/teachers', icon: Users, label: t('start.s3'), done: summary.teachers > 0 },
+    { to: '/a/students', icon: GraduationCap, label: t('start.s4'), done: summary.students > 0 },
+  ];
+  return (
+    <Card className="chalkboard mb-4 border-0 p-6">
+      <h2 className="text-2xl font-bold">{t('start.title')}</h2>
+      <p className="mt-1 text-chalk/80">{t('start.sub')}</p>
+      <ol className="mt-5 grid gap-2 sm:grid-cols-2">
+        {steps.map((s, i) => (
+          <li key={s.to}>
+            <Link to={s.to} className="flex min-h-14 items-center gap-3 rounded-xl bg-card px-4 py-3 font-semibold text-ink shadow-lift hover:brightness-95">
+              <span className={`flex size-8 shrink-0 items-center justify-center rounded-full ${s.done ? 'bg-present text-white' : 'bg-accent text-on-brand'}`}>
+                {s.done ? <CheckCircle2 className="size-5" aria-hidden /> : i + 1}
+              </span>
+              <s.icon className="size-5 shrink-0 text-board-text" aria-hidden />
+              <span className="flex-1">{s.label}</span>
+              <ChevronRight className="size-5 text-muted" aria-hidden />
+            </Link>
+          </li>
+        ))}
+      </ol>
+    </Card>
   );
 }

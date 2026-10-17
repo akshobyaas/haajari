@@ -28,6 +28,11 @@ Time needed: about 20 minutes. Cost: free tiers of both services (check their cu
 
 Check it: `https://<your-address>/api/health` should answer `{"ok":true,...}`.
 
+5. **Approver login** (the block office that approves new schools): in the service's **Environment** tab add
+   `SUPERADMIN_EMAIL` (for example `office@haajari.in`) and `SUPERADMIN_PASSWORD` (8+ characters), then **Save**.
+   Render restarts the service and the account is created; log in with it on the School office tab.
+   To change the password later, change `SUPERADMIN_PASSWORD` here; it takes effect when the service restarts.
+
 ## 3. Phones
 
 - Open the address in Chrome on Android → menu → **Add to Home screen**. It now opens like an app and works offline.
@@ -53,6 +58,7 @@ Check it: `https://<your-address>/api/health` should answer `{"ok":true,...}`.
 | `CLIENT_ORIGIN` | The site's own address (CORS) |
 | `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY` | Notification keys. If empty they are created on start, but Render's disk is wiped on each deploy, so phones would need to turn alerts on again; generate once with `npx web-push generate-vapid-keys` and set both |
 | `SERVE_CLIENT` | `false` to run the API alone (if you host the app elsewhere) |
+| `SUPERADMIN_EMAIL`, `SUPERADMIN_PASSWORD` | The approver (block office) account that approves and adds schools; created on start if missing |
 
 ## For a real school (beyond the demo)
 

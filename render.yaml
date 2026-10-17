@@ -23,5 +23,9 @@ services:
         value: dev # shows the OTP on screen for the demo; use an SMS provider for a real school
       - key: SEED_ON_EMPTY
         value: "true" # loads the demo school on first start
+      - key: SUPERADMIN_EMAIL
+        value: office@haajari.in # the block office that approves new schools
+      - key: SUPERADMIN_PASSWORD
+        sync: false # set it in the Environment tab; the account is created on start
       - key: CLIENT_ORIGIN
         value: https://haajari.onrender.com

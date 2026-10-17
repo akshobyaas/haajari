@@ -43,6 +43,7 @@ function createApp() {
   app.use('/api/reports', requireAuth, require('./routes/reports'));
   app.use('/api/me', requireAuth, require('./routes/me'));
   app.use('/api/dashboard', requireAuth, requireRole('admin'), require('./routes/dashboard'));
+  app.use('/api/platform', requireAuth, requireRole('superadmin'), require('./routes/platform'));
 
   app.use('/api', (_req, res) => res.status(404).json({ error: { code: 'not_found', message: 'No such API route.' } }));
   serveClient(app);

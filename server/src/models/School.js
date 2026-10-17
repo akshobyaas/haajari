@@ -1,10 +1,23 @@
 const { Schema, model } = require('mongoose');
+const { SCHOOL_STATUSES } = require('./constants');
 
 const holidaySchema = new Schema({ date: { type: String, required: true }, name: String }, { _id: false });
 
 const schoolSchema = new Schema(
   {
     name: { type: String, required: true, trim: true },
+    // A school asking to join waits as 'pending' until the approver accepts it; nobody can log in before that.
+    status: { type: String, enum: SCHOOL_STATUSES, default: 'active', index: true },
+    request: {
+      hmName: String,
+      hmEmail: String,
+      hmPhone: String,
+      note: String,
+      requestedAt: Date,
+    },
+    decidedBy: { type: Schema.Types.ObjectId, ref: 'User' },
+    decidedAt: Date,
+    rejectReason: String,
     udiseCode: { type: String, trim: true },
     district: String,
     block: String,
