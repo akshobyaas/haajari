@@ -69,7 +69,10 @@
     "call": "Call",
     "none": "None",
     "back": "Back",
-    "offline": "No internet. Showing saved data."
+    "offline": "No internet. Showing saved data.",
+    "crashTitle": "This screen did not load",
+    "crashBody": "Your saved attendance is safe on this phone. Reload to try again.",
+    "reload": "Reload"
   },
   "grade": {
     "PREKG": "Pre-KG",

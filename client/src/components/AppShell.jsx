@@ -1,4 +1,5 @@
-import { NavLink, Outlet } from 'react-router-dom';
+import { NavLink, Outlet, useLocation } from 'react-router-dom';
+import ErrorBoundary from './ErrorBoundary';
 import { useTranslation } from 'react-i18next';
 import { Home, LayoutGrid, Users, GraduationCap, Settings, CircleUser, WifiOff, Bell, CalendarOff, FileSpreadsheet, HeartHandshake } from 'lucide-react';
 import { useUnread } from '../lib/notifications';
@@ -42,6 +43,7 @@ function useOnline() {
 }
 
 export default function AppShell() {
+  const { pathname } = useLocation();
   const { t } = useTranslation();
   const user = useAuth((s) => s.user);
   const online = useOnline();
@@ -81,7 +83,7 @@ export default function AppShell() {
           </div>
         )}
         <main className="mx-auto w-full max-w-6xl flex-1 print:max-w-none print:p-0 px-4 pt-[max(1.25rem,env(safe-area-inset-top))] pb-28 lg:px-8 lg:pt-8 lg:pb-12">
-          <Suspense fallback={<Skeleton className="h-48" />}><Outlet /></Suspense>
+          <ErrorBoundary resetKey={pathname}><Suspense fallback={<Skeleton className="h-48" />}><Outlet /></Suspense></ErrorBoundary>
         </main>
       </div>
 

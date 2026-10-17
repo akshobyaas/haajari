@@ -1,5 +1,6 @@
 import { useEffect, lazy, Suspense } from 'react';
-import { Navigate, Route, Routes } from 'react-router-dom';
+import ErrorBoundary from './components/ErrorBoundary';
+import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
 import { useAuth, homeFor } from './lib/auth';
 import Toaster from './components/Toast';
 import { Skeleton } from './components/ui';
@@ -35,6 +36,7 @@ function Guard({ role, children }) {
 
 export default function App() {
   const user = useAuth((s) => s.user);
+  const { pathname } = useLocation();
   useEffect(() => {
     if (!user) return;
     if (user.role === 'teacher' || user.role === 'admin') import('./offline/sync').then((m) => m.startBackgroundSync());
@@ -43,6 +45,7 @@ export default function App() {
   return (
     <>
       {/* Teachers on 3G download only what the morning register needs; other screens load when opened. */}
+      <ErrorBoundary resetKey={pathname}>
       <Suspense fallback={<div className="mx-auto max-w-3xl p-6"><Skeleton className="h-40" /></div>}>
       <Routes>
         <Route path="/login" element={user ? <Navigate to={homeFor(user.role)} replace /> : <Login />} />
@@ -73,6 +76,7 @@ export default function App() {
         <Route path="*" element={<Navigate to={user ? homeFor(user.role) : '/login'} replace />} />
       </Routes>
       </Suspense>
+      </ErrorBoundary>
       <Toaster />
     </>
   );
