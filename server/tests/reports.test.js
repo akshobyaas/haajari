@@ -2,8 +2,8 @@ const crypto = require('crypto');
 const ExcelJS = require('exceljs');
 const { api, start, stop, auth, loginAdmin, loginPin, DEMO } = require('./helpers');
 const { ClassRoom, Attendance, School, Student, RiskFlag, User, PickupLog } = require('../src/models');
-const { todayIn, closedReason } = require('../src/utils/dates');
-const { evaluateRisk } = require('../src/workers/risk');
+const { todayIn, closedReason } = require('../src/shared/dates');
+const { evaluateRisk } = require('../src/modules/risk/risk.service');
 
 const today = todayIn('Asia/Kolkata');
 const month = today.slice(0, 7);

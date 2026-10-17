@@ -2,12 +2,14 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import { Camera, Trash2, Plus } from 'lucide-react';
-import { api, errorMessage } from '../../lib/api';
+import { errorMessage } from '../../api/client';
 import { resizeImage } from '../../lib/image';
-import Sheet from '../Sheet';
-import Avatar from '../Avatar';
-import { useToast } from '../Toast';
+import Sheet from '../ui/Sheet';
+import Avatar from '../ui/Avatar';
+import { useToast } from '../ui/Toast';
 import { Button, Notice } from '../ui';
+import { parentsApi } from '../../api/parents';
+import { keys } from '../../api/keys';
 
 const inputCls = 'min-h-11 w-full rounded-xl border border-line px-3 outline-none focus:border-board focus:ring-4 focus:ring-board/10';
 
@@ -31,8 +33,8 @@ export default function GuardiansSheet({ open, onClose, student }) {
     setBusy(true);
     setError('');
     try {
-      await api.put(`/me/children/${student._id}/guardians`, { guardians: list });
-      qc.invalidateQueries({ queryKey: ['children'] });
+      await parentsApi.setGuardians(student._id, list);
+      qc.invalidateQueries({ queryKey: keys.children });
       toast(t('parent.listSaved'));
       onClose();
     } catch (e) {

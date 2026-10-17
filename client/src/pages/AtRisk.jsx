@@ -2,13 +2,15 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Phone, MessageCircle, RefreshCw, PhoneCall, Home, Send } from 'lucide-react';
-import { api, errorMessage } from '../lib/api';
-import { useAuth } from '../lib/auth';
+import { errorMessage } from '../api/client';
+import { useAuth } from '../stores/auth';
 import { classLabel, firstName } from '../lib/format';
 import { fmtDay, fmtStamp } from '../lib/dates';
-import { useToast } from '../components/Toast';
+import { useToast } from '../components/ui/Toast';
 import { Button, Card, Notice, PageTitle, Skeleton } from '../components/ui';
-import Avatar from '../components/Avatar';
+import Avatar from '../components/ui/Avatar';
+import { riskApi, riskQuery } from '../api/risk';
+import { keys } from '../api/keys';
 
 // Children absent several days in a row or below the threshold, and what has been done about it.
 export default function AtRisk() {
@@ -16,10 +18,10 @@ export default function AtRisk() {
   const qc = useQueryClient();
   const toast = useToast((s) => s.show);
   const admin = useAuth((s) => s.user.role === 'admin');
-  const q = useQuery({ queryKey: ['risk'], queryFn: () => api.get('/risk').then((r) => r.data) });
+  const q = useQuery(riskQuery());
   const refresh = useMutation({
-    mutationFn: () => api.post('/risk/refresh'),
-    onSuccess: () => qc.invalidateQueries({ queryKey: ['risk'] }),
+    mutationFn: riskApi.refresh,
+    onSuccess: () => qc.invalidateQueries({ queryKey: keys.risk }),
     onError: (e) => toast(errorMessage(e)),
   });
   return (
@@ -45,8 +47,8 @@ function RiskCard({ flag }) {
   const s = flag.studentId;
   const parent = s?.parentIds?.[0];
   const save = useMutation({
-    mutationFn: () => api.post(`/risk/${flag._id}/follow-up`, { type, note: note || undefined }),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['risk'] }); setType(null); setNote(''); },
+    mutationFn: () => riskApi.followUp(flag._id, { type, note: note || undefined }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: keys.risk }); setType(null); setNote(''); },
     onError: (e) => toast(errorMessage(e)),
   });
   const wa = parent && `https://wa.me/91${parent.phone}?text=${encodeURIComponent(t('risk.waText', { name: firstName(s.name) }))}`;

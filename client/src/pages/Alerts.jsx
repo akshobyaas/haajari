@@ -1,13 +1,14 @@
 import { useEffect } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
-import { useUnread } from '../lib/notifications';
+import { useUnread } from '../hooks/useUnread';
 import { useNavigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Bell } from 'lucide-react';
-import { api } from '../lib/api';
 import { fmtStamp } from '../lib/dates';
 import { Card, PageTitle, Skeleton, Notice } from '../components/ui';
 import AlertsPrompt from '../components/parent/AlertsPrompt';
+import { notificationsApi } from '../api/notifications';
+import { keys } from '../api/keys';
 
 
 export default function Alerts() {
@@ -17,7 +18,7 @@ export default function Alerts() {
   const q = useUnread();
   // Opening the list counts as reading it.
   useEffect(() => {
-    if (q.data?.unread) api.post('/me/notifications/read', {}).then(() => qc.invalidateQueries({ queryKey: ['notifications'] }));
+    if (q.data?.unread) notificationsApi.markRead().then(() => qc.invalidateQueries({ queryKey: keys.notifications }));
   }, [q.data?.unread, qc]);
   return (
     <div className="mx-auto max-w-xl">

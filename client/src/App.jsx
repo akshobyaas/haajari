@@ -1,13 +1,13 @@
 import { useEffect, lazy, Suspense } from 'react';
-import ErrorBoundary from './components/ErrorBoundary';
+import ErrorBoundary from './components/layout/ErrorBoundary';
 import { Navigate, Route, Routes, useLocation } from 'react-router-dom';
-import { useAuth, homeFor } from './lib/auth';
-import Toaster from './components/Toast';
+import { useAuth, homeFor } from './stores/auth';
+import Toaster from './components/ui/Toast';
 import { Skeleton } from './components/ui';
 import Login from './pages/Login';
 
 // Every screen except Login loads on demand; after the first visit the service worker keeps them all on the phone.
-const AppShell = lazy(() => import('./components/AppShell'));
+const AppShell = lazy(() => import('./components/layout/AppShell'));
 const Setup = lazy(() => import('./pages/Setup'));
 const Account = lazy(() => import('./pages/Account'));
 const TeacherHome = lazy(() => import('./pages/teacher/Home'));

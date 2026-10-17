@@ -1,13 +1,21 @@
 import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { MutationCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ensureLanguage, initialLanguage } from './i18n';
 import './lib/theme';
 import './index.css';
 import App from './App';
+import { errorMessage } from './api/client';
+import { useToast } from './components/ui/Toast';
 
 const queryClient = new QueryClient({
+  // A save that fails and has no error handling of its own still tells the user why.
+  mutationCache: new MutationCache({
+    onError: (err, _vars, _ctx, mutation) => {
+      if (!mutation.options.onError) useToast.getState().show(errorMessage(err));
+    },
+  }),
   defaultOptions: {
     // networkMode 'always': never pause a request because the phone looks offline. Our loaders
     // fall back to data saved on the phone (src/offline), so a teacher who loses signal after

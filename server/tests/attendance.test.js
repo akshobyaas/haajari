@@ -1,7 +1,7 @@
 const crypto = require('crypto');
 const { api, start, stop, auth, loginAdmin, loginPin, DEMO } = require('./helpers');
 const { ClassRoom, Attendance, AuditLog, School, Student, User } = require('../src/models');
-const { todayIn, closedReason, addDays } = require('../src/utils/dates');
+const { todayIn, closedReason, addDays } = require('../src/shared/dates');
 
 let teacher, admin, fourA, students, today, school;
 const cid = () => crypto.randomUUID();

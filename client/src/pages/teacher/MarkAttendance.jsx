@@ -8,15 +8,16 @@ import { ArrowLeft, ChevronLeft, ChevronRight, CloudOff, History, RotateCcw, Che
 import { db } from '../../offline/db';
 import { loadRoster, loadClasses, editNeedsReason, localToday } from '../../offline/roster';
 import { saveMarks, retryBatch, discardBatch } from '../../offline/sync';
-import { api } from '../../lib/api';
 import { classLabel } from '../../lib/format';
 import { reasonText } from '../../lib/dates';
 import { STATUS_STYLE } from '../../lib/status';
-import StudentRow from '../../components/StudentRow';
-import Confetti from '../../components/Confetti';
-import Sheet from '../../components/Sheet';
-import { useToast } from '../../components/Toast';
+import StudentRow from '../../components/attendance/StudentRow';
+import Confetti from '../../components/ui/Confetti';
+import Sheet from '../../components/ui/Sheet';
+import { useToast } from '../../components/ui/Toast';
 import { Button, Notice, Skeleton } from '../../components/ui';
+import { auditQuery } from '../../api/attendance';
+import { keys } from '../../api/keys';
 
 const dayShift = (iso, n) => {
   const d = new Date(`${iso}T00:00:00Z`);
@@ -34,7 +35,7 @@ export default function MarkAttendance() {
   const qc = useQueryClient();
 
   const date = params.get('date') || '';
-  const roster = useQuery({ queryKey: ['roster', id, date], queryFn: () => loadRoster(id, date || undefined), retry: false });
+  const roster = useQuery({ queryKey: keys.rosterFor(id, date), queryFn: () => loadRoster(id, date || undefined), retry: false });
   const r = roster.data;
   const theDate = r?.date || date;
   const period = Number(params.get('period') ?? (r?.class.mode === 'period' ? 1 : 0));
@@ -100,7 +101,7 @@ export default function MarkAttendance() {
     await saveMarks({ classId: id, date: theDate, period, statuses, serverMarks, editReason });
     setDraft({});
     setReasonOpen(false);
-    qc.invalidateQueries({ queryKey: ['classes'] });
+    qc.invalidateQueries({ queryKey: keys.classes });
     if (firstSave) setDone({ present: counts.P + counts.L, total: students.length });
     else toast(navigator.onLine ? t('mark.savedServer') : t('mark.savedPhone'));
   };
@@ -292,11 +293,7 @@ function ReasonSheet({ open, onClose, onSave }) {
 
 function AuditSheet({ student, date, onClose }) {
   const { t, i18n } = useTranslation();
-  const q = useQuery({
-    queryKey: ['audit', student?._id, date],
-    queryFn: () => api.get('/attendance/audit', { params: { studentId: student._id, date } }).then((x) => x.data.logs),
-    enabled: Boolean(student),
-  });
+  const q = useQuery({ ...auditQuery(student?._id, date), enabled: Boolean(student) });
   return (
     <Sheet open={Boolean(student)} onClose={onClose} title={student ? t('mark.changes', { name: student.name }) : ''}>
       {q.isLoading && <Skeleton className="h-16" />}
@@ -316,7 +313,7 @@ function AuditSheet({ student, date, onClose }) {
 
 function DoneOverlay({ done, classId, go }) {
   const { t } = useTranslation();
-  const classes = useQuery({ queryKey: ['classes'], queryFn: loadClasses, enabled: Boolean(done) });
+  const classes = useQuery({ queryKey: keys.classOverview, queryFn: loadClasses, enabled: Boolean(done) });
   const next = classes.data?.classes.find((c) => c._id !== classId && !c.today);
   return (
     <AnimatePresence>

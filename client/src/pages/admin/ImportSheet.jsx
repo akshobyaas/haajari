@@ -2,10 +2,13 @@ import { useState } from 'react';
 import { useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { FileSpreadsheet, Download } from 'lucide-react';
-import { api, errorMessage } from '../../lib/api';
-import Sheet from '../../components/Sheet';
-import { useToast } from '../../components/Toast';
+import { errorMessage } from '../../api/client';
+import Sheet from '../../components/ui/Sheet';
+import { useToast } from '../../components/ui/Toast';
 import { Button, Notice } from '../../components/ui';
+import { studentsApi } from '../../api/students';
+import { saveBlob } from '../../api/reports';
+import { keys } from '../../api/keys';
 
 const COLUMNS = 'admission_no, name, grade, section, roll_no, gender, dob, sats_id, parent_name, parent_phone, relation';
 
@@ -23,10 +26,9 @@ export default function ImportSheet({ open, onClose }) {
     const body = new FormData();
     body.append('file', f);
     try {
-      const r = await api.post(`/students/import${dryRun ? '?dryRun=true' : ''}`, body);
-      return r.data;
+      return await studentsApi.import(body, { dryRun });
     } catch (e) {
-      if (e.response?.status === 422) return e.response.data;
+      if (e.response?.status === 422) return e.response.data; // the sheet has problems: show them
       throw e;
     }
   };
@@ -40,17 +42,14 @@ export default function ImportSheet({ open, onClose }) {
     try {
       const r = await send(file, false);
       if (!r.ok) { setResult(r); return; }
-      ['students', 'classes', 'summary'].forEach((k) => qc.invalidateQueries({ queryKey: [k] }));
+      [keys.students, keys.classes, keys.summary].forEach((queryKey) => qc.invalidateQueries({ queryKey }));
       toast(t('admin.imported', r));
       close();
     } catch (e) { setError(errorMessage(e)); } finally { setBusy(false); }
   };
   const close = () => { setFile(null); setResult(null); setError(''); onClose(); };
   const template = async () => {
-    const r = await api.get('/students/import/template', { responseType: 'blob' });
-    const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(r.data), download: 'haajari-students-template.csv' });
-    a.click();
-    URL.revokeObjectURL(a.href);
+    try { saveBlob(await studentsApi.template(), 'haajari-students-template.csv'); } catch (e) { setError(errorMessage(e)); }
   };
 
   return (

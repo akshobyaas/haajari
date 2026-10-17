@@ -3,12 +3,13 @@ import { useNavigate, useSearchParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AnimatePresence, motion } from 'motion/react';
 import { ArrowLeft } from 'lucide-react';
-import BoardHeader from '../components/BoardHeader';
-import PinPad from '../components/PinPad';
+import BoardHeader from '../components/layout/BoardHeader';
+import PinPad from '../components/auth/PinPad';
 import { Button, Input, Notice } from '../components/ui';
-import { api, errorMessage } from '../lib/api';
-import { useAuth, homeFor } from '../lib/auth';
+import { errorMessage } from '../api/client';
+import { useAuth, homeFor } from '../stores/auth';
 import { prettyPhone, firstName } from '../lib/format';
+import { authApi } from '../api/auth';
 
 // First-time setup and PIN reset: phone -> OTP -> PIN -> confirm PIN.
 export default function Setup() {
@@ -33,14 +34,13 @@ export default function Setup() {
   };
 
   const sendCode = () => run(async () => {
-    const r = await api.post('/auth/otp/request', { phone });
-    setDevCode(r.data.devCode || '');
+    const r = await authApi.requestOtp(phone);
+    setDevCode(r.devCode || ''); // demo mode only: the OTP shown on screen
     setCode('');
     setStep('code');
   });
   const verify = () => run(async () => {
-    const r = await api.post('/auth/otp/verify', { phone, code });
-    setSetup(r.data);
+    setSetup(await authApi.verifyOtp(phone, code));
     setStep('pin');
   });
   const choosePin = (v) => { setFirst(v); setPin(''); setStep('confirm'); };
@@ -51,9 +51,9 @@ export default function Setup() {
       return;
     }
     run(async () => {
-      const r = await api.post('/auth/pin/setup', { setupToken: setup.setupToken, pin: v });
-      setSession(r.data);
-      navigate(homeFor(r.data.user.role), { replace: true });
+      const session = await authApi.setupPin(setup.setupToken, v);
+      setSession(session);
+      navigate(homeFor(session.user.role), { replace: true });
     });
   };
 

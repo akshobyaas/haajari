@@ -6,13 +6,13 @@ import { useNavigate } from 'react-router-dom';
 import { LogOut, LayoutGrid, GraduationCap, Users, Settings, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { useQueryClient } from '@tanstack/react-query';
-import { useAuth } from '../lib/auth';
+import { useAuth } from '../stores/auth';
 import { prettyPhone } from '../lib/format';
 import { Card, Button, PageTitle, Notice } from '../components/ui';
-import LanguageSwitch from '../components/LanguageSwitch';
+import LanguageSwitch from '../components/layout/LanguageSwitch';
 import { getTheme, setTheme } from '../lib/theme';
-import { useDataSaver } from '../lib/dataSaver';
-import Avatar from '../components/Avatar';
+import { useDataSaver } from '../stores/dataSaver';
+import Avatar from '../components/ui/Avatar';
 
 export default function Account() {
   const { t } = useTranslation();

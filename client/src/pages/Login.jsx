@@ -3,13 +3,14 @@ import { useNavigate, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { AnimatePresence, motion } from 'motion/react';
 import { ArrowLeft } from 'lucide-react';
-import BoardHeader from '../components/BoardHeader';
-import PinPad from '../components/PinPad';
-import { Button, Input, Notice } from '../components/ui';
-import { api, errorMessage, errorDetails } from '../lib/api';
-import { useAuth, homeFor } from '../lib/auth';
+import BoardHeader from '../components/layout/BoardHeader';
+import PinPad from '../components/auth/PinPad';
+import { Button, Input, Notice, PasswordInput } from '../components/ui';
+import { errorMessage, errorDetails } from '../api/client';
+import { useAuth, homeFor } from '../stores/auth';
 import { setLanguage } from '../i18n';
 import { prettyPhone } from '../lib/format';
+import { authApi } from '../api/auth';
 
 const DEMO = [
   { label: 'Teacher · 4-A', phone: '9000000007' },
@@ -56,7 +57,7 @@ function useFinish() {
     let picked = null;
     try { picked = sessionStorage.getItem('haajari.pickedLang'); sessionStorage.removeItem('haajari.pickedLang'); } catch { /* private mode */ }
     if (picked && picked !== data.user.language) {
-      api.patch('/auth/me', { language: picked }).then((r) => useAuth.getState().setUser(r.data.user)).catch(() => {});
+      authApi.updateMe({ language: picked }).then((user) => useAuth.getState().setUser(user)).catch(() => {});
     } else if (data.user.language) setLanguage(data.user.language);
     navigate(homeFor(data.user.role), { replace: true });
   };
@@ -77,8 +78,7 @@ function PhoneLogin() {
     setBusy(true);
     setError('');
     try {
-      const r = await api.post('/auth/pin-login', { phone, pin: value });
-      finish(r.data);
+      finish(await authApi.pinLogin(phone, value));
     } catch (e) {
       if (errorDetails(e).needsSetup) return navigate(`/setup?phone=${phone}`);
       setError(errorMessage(e));
@@ -160,7 +160,7 @@ function StaffLogin() {
     setBusy(true);
     setError('');
     try {
-      finish((await api.post('/auth/login', form)).data);
+      finish(await authApi.login(form.email, form.password));
     } catch (err) {
       setError(errorMessage(err));
     } finally {
@@ -170,7 +170,7 @@ function StaffLogin() {
   return (
     <form onSubmit={submit} className="space-y-4">
       <Input name="email" type="email" label={t('login.email')} autoComplete="username" value={form.email} onChange={(e) => setForm({ ...form, email: e.target.value })} required />
-      <Input name="password" type="password" label={t('login.password')} autoComplete="current-password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required />
+      <PasswordInput name="password" label={t('login.password')} autoComplete="current-password" value={form.password} onChange={(e) => setForm({ ...form, password: e.target.value })} required />
       {error && <Notice tone="error">{error}</Notice>}
       <Button type="submit" loading={busy} className="w-full">{t('login.logIn')}</Button>
       {import.meta.env.DEV && (

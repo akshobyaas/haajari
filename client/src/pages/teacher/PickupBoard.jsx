@@ -7,15 +7,17 @@ import { motion } from 'motion/react';
 import { ArrowLeft, ScanLine, Home, Phone, ShieldAlert } from 'lucide-react';
 import { db } from '../../offline/db';
 import { saveMarks } from '../../offline/sync';
-import { api, errorMessage } from '../../lib/api';
+import { errorMessage } from '../../api/client';
 import { classLabel, firstName } from '../../lib/format';
 import { fmtTime } from '../../lib/dates';
-import Sheet from '../../components/Sheet';
-import QrScan from '../../components/QrScan';
-import Avatar from '../../components/Avatar';
-import { useToast } from '../../components/Toast';
+import Sheet from '../../components/ui/Sheet';
+import QrScan from '../../components/pickup/QrScan';
+import Avatar from '../../components/ui/Avatar';
+import { useToast } from '../../components/ui/Toast';
 import { Button, Notice, Skeleton } from '../../components/ui';
-import { live } from '../../lib/dataSaver';
+import { live } from '../../stores/dataSaver';
+import { pickupApi, pickupQuery } from '../../api/pickup';
+import { keys } from '../../api/keys';
 
 // Reads the child and guardian ids from a pass so the teacher can compare faces before handing over.
 // The server still verifies the signature; this is only for showing the photo.
@@ -46,7 +48,7 @@ export default function PickupBoard() {
   const { t } = useTranslation();
   const qc = useQueryClient();
   const toast = useToast((s) => s.show);
-  const board = useQuery({ queryKey: ['pickup', id], queryFn: () => api.get(`/pickup/class/${id}/today`).then((r) => r.data), refetchInterval: () => live(30_000) });
+  const board = useQuery({ ...pickupQuery(id), refetchInterval: () => live(30_000) });
   const b = board.data;
   const local = useLiveQuery(() => (b ? db.marks.where('[classId+date+period]').equals([id, b.date, 0]).toArray() : []), [id, b?.date], []);
   const [handing, setHanding] = useState(null); // { student, guardianId?, passToken? }
@@ -139,8 +141,8 @@ export default function PickupBoard() {
       <HandOver handing={handing} onClose={() => setHanding(null)} onDone={(child, g, pickup) => {
         setHanding(null);
         // Show "gone home" at once from the server's reply, then refresh in the background.
-        qc.setQueryData(['pickup', id], (old) => old && { ...old, students: old.students.map((x) => (x._id === child._id ? { ...x, pickup } : x)) });
-        qc.invalidateQueries({ queryKey: ['pickup', id] });
+        qc.setQueryData(keys.pickup(id), (old) => old && { ...old, students: old.students.map((x) => (x._id === child._id ? { ...x, pickup } : x)) });
+        qc.invalidateQueries({ queryKey: keys.pickup(id) });
         toast(t('pickup.handedOver', { child: firstName(child.name), name: g.name }));
       }} onScan={() => { setHanding(null); setScanning(true); }} />
       <Sheet open={Boolean(doneFor)} onClose={() => setDoneFor(null)} title={doneFor?.name || ''}>
@@ -149,9 +151,9 @@ export default function PickupBoard() {
             <p className="text-lg">{t('pickup.by', { name: `${doneFor.pickup.collectedBy?.name} (${doneFor.pickup.collectedBy?.relation})`, time: fmtTime(doneFor.pickup.checkOutAt) })}</p>
             <Button variant="quiet" className="w-full" onClick={async () => {
               try {
-                await api.post('/pickup/undo', { studentId: doneFor._id });
-                qc.setQueryData(['pickup', id], (old) => old && { ...old, students: old.students.map((x) => (x._id === doneFor._id ? { ...x, pickup: null } : x)) });
-                qc.invalidateQueries({ queryKey: ['pickup', id] });
+                await pickupApi.undo(doneFor._id);
+                qc.setQueryData(keys.pickup(id), (old) => old && { ...old, students: old.students.map((x) => (x._id === doneFor._id ? { ...x, pickup: null } : x)) });
+                qc.invalidateQueries({ queryKey: keys.pickup(id) });
                 setDoneFor(null);
               } catch (e) { toast(errorMessage(e)); }
             }}>{t('pickup.undo')}</Button>
@@ -178,7 +180,7 @@ function HandOver({ handing, onClose, onDone, onScan }) {
     setBusy(true);
     setError('');
     try {
-      const { data } = await api.post('/pickup/checkout', handing.passToken ? { passToken: handing.passToken, studentId: s._id } : { studentId: s._id, guardianId: chosen });
+      const data = await pickupApi.checkout(handing.passToken ? { passToken: handing.passToken, studentId: s._id } : { studentId: s._id, guardianId: chosen });
       onDone(s, g, data.pickup);
     } catch (e) {
       setError(e.response ? errorMessage(e) : t('pickup.needOnline'));

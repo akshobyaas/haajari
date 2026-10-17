@@ -1,6 +1,6 @@
-import { api } from './api';
+import { notificationsApi } from '../api/notifications';
 
-export const pushSupported = () => 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
+const pushSupported = () => 'serviceWorker' in navigator && 'PushManager' in window && 'Notification' in window;
 export const pushState = () => (pushSupported() ? Notification.permission : 'unsupported'); // default | granted | denied | unsupported
 
 const b64ToBytes = (b64) => {
@@ -15,9 +15,9 @@ export async function enablePush() {
   const permission = await Notification.requestPermission();
   if (permission !== 'granted') return permission;
   const reg = await navigator.serviceWorker.ready;
-  const { data } = await api.get('/public/push/key');
-  const sub = (await reg.pushManager.getSubscription()) || (await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64ToBytes(data.publicKey) }));
-  await api.post('/me/push', sub.toJSON());
+  const publicKey = await notificationsApi.pushKey();
+  const sub = (await reg.pushManager.getSubscription()) || (await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: b64ToBytes(publicKey) }));
+  await notificationsApi.savePushSubscription(sub.toJSON());
   return 'granted';
 }
 
@@ -27,6 +27,6 @@ export async function refreshPush() {
   try {
     const reg = await navigator.serviceWorker.ready;
     const sub = await reg.pushManager.getSubscription();
-    if (sub) await api.post('/me/push', sub.toJSON());
+    if (sub) await notificationsApi.savePushSubscription(sub.toJSON());
   } catch { /* offline; next open will retry */ }
 }

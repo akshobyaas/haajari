@@ -3,16 +3,18 @@ import { useParams, Link } from 'react-router-dom';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, ChevronLeft, ChevronRight, Plus, QrCode, Pencil } from 'lucide-react';
-import { api } from '../../lib/api';
 import { classLabel, firstName, prettyPhone } from '../../lib/format';
 import { fmtDay, fmtMonth, shiftMonth, reasonText } from '../../lib/dates';
 import { Card, Skeleton, Notice, Button } from '../../components/ui';
-import Avatar from '../../components/Avatar';
+import Avatar from '../../components/ui/Avatar';
 import MonthCalendar from '../../components/parent/MonthCalendar';
 import ReasonButtons from '../../components/parent/ReasonButtons';
 import LeaveSheet from '../../components/parent/LeaveSheet';
 import GuardiansSheet from '../../components/parent/GuardiansSheet';
 import PassSheet from '../../components/parent/PassSheet';
+import { childrenQuery, childMonthQuery } from '../../api/parents';
+import { leaveApi } from '../../api/leave';
+import { keys } from '../../api/keys';
 
 export default function Child() {
   const { id } = useParams();
@@ -20,20 +22,17 @@ export default function Child() {
   const qc = useQueryClient();
   const [month, setMonth] = useState(null);
   const [sheet, setSheet] = useState(null); // 'leave' | 'guardians' | 'pass'
-  const children = useQuery({ queryKey: ['children'], queryFn: () => api.get('/me/children').then((r) => r.data.children) });
+  const children = useQuery(childrenQuery());
   const child = children.data?.find((c) => c._id === id);
-  const q = useQuery({
-    queryKey: ['child-month', id, month],
-    queryFn: () => api.get(`/me/children/${id}/attendance`, { params: month ? { month } : {} }).then((r) => r.data),
-  });
+  const q = useQuery(childMonthQuery(id, month));
   const d = q.data;
   const shown = month || d?.month;
   const absences = d?.days.filter((x) => x.status === 'A') || [];
   const prePrimary = child?.classId?.mode === 'checkin';
 
   const withdraw = async (leaveId) => {
-    await api.delete(`/leave/${leaveId}`);
-    qc.invalidateQueries({ queryKey: ['child-month'] });
+    await leaveApi.cancel(leaveId);
+    qc.invalidateQueries({ queryKey: keys.childMonth });
   };
 
   return (

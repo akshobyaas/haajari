@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
-import { api, errorMessage } from '../../lib/api';
+import { errorMessage } from '../../api/client';
 import { localToday } from '../../offline/roster';
-import Sheet from '../Sheet';
-import { useToast } from '../Toast';
+import Sheet from '../ui/Sheet';
+import { useToast } from '../ui/Toast';
 import { Button, Input, Notice } from '../ui';
+import { leaveApi } from '../../api/leave';
+import { keys } from '../../api/keys';
 
 export default function LeaveSheet({ open, onClose, student }) {
   const { t } = useTranslation();
@@ -20,8 +22,8 @@ export default function LeaveSheet({ open, onClose, student }) {
     setBusy(true);
     setError('');
     try {
-      await api.post('/leave', { studentId: student._id, ...f });
-      qc.invalidateQueries({ queryKey: ['child-month'] });
+      await leaveApi.apply({ studentId: student._id, ...f });
+      qc.invalidateQueries({ queryKey: keys.childMonth });
       toast(t('parent.leaveSent'));
       setF({ from: today, to: today, reason: '' });
       onClose();

@@ -2,13 +2,15 @@ import { useState } from 'react';
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Building2, Check, Mail, Phone, Plus, X } from 'lucide-react';
-import { api, errorMessage } from '../../lib/api';
+import { errorMessage } from '../../api/client';
 import { fmtDay } from '../../lib/dates';
-import { live } from '../../lib/dataSaver';
+import { live } from '../../stores/dataSaver';
 import { Button, Card, Notice, PageTitle, Skeleton } from '../../components/ui';
-import Sheet from '../../components/Sheet';
-import SchoolForm from '../../components/SchoolForm';
-import { useToast } from '../../components/Toast';
+import Sheet from '../../components/ui/Sheet';
+import SchoolForm from '../../components/schools/SchoolForm';
+import { useToast } from '../../components/ui/Toast';
+import { platformApi, schoolsQuery } from '../../api/platform';
+import { keys } from '../../api/keys';
 
 // The block office's console: approve schools that asked to join, add schools directly,
 // and see whether every school has taken today's register.
@@ -17,8 +19,7 @@ export default function Schools() {
   const qc = useQueryClient();
   const toast = useToast((s) => s.show);
   const list = useQuery({
-    queryKey: ['platform-schools'],
-    queryFn: () => api.get('/platform/schools').then((r) => r.data.schools),
+    ...schoolsQuery(),
     refetchInterval: () => live(60_000),
   });
   const [tab, setTab] = useState(null);
@@ -32,11 +33,11 @@ export default function Schools() {
   const current = tab || (pending.length ? 'requests' : 'schools');
 
   const decide = useMutation({
-    mutationFn: ({ id, decision, reason }) => api.post(`/platform/schools/${id}/decision`, { decision, reason }),
-    onSuccess: (r, v) => {
-      qc.invalidateQueries({ queryKey: ['platform-schools'] });
+    mutationFn: ({ id, decision, reason }) => platformApi.decide(id, decision, reason),
+    onSuccess: (school, v) => {
+      qc.invalidateQueries({ queryKey: keys.schools });
       setRejecting(null);
-      toast(v.decision === 'approved' ? t('office.approved', { name: r.data.school.name }) : t('office.rejected'));
+      toast(v.decision === 'approved' ? t('office.approved', { name: school.name }) : t('office.rejected'));
     },
     onError: (e) => toast(errorMessage(e)),
   });
@@ -110,11 +111,11 @@ export default function Schools() {
         <SchoolForm
           submitLabel={t('office.add')}
           onSubmit={async (body) => {
-            const r = await api.post('/platform/schools', body);
-            qc.invalidateQueries({ queryKey: ['platform-schools'] });
+            const school = await platformApi.addSchool(body);
+            qc.invalidateQueries({ queryKey: keys.schools });
             setAdding(false);
             setTab('schools');
-            toast(t('office.added', { name: r.data.school.name }));
+            toast(t('office.added', { name: school.name }));
           }}
         />
       </Sheet>

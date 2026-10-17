@@ -1,10 +1,11 @@
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import QRCode from 'qrcode';
-import { api, errorMessage } from '../../lib/api';
-import Sheet from '../Sheet';
-import Avatar from '../Avatar';
+import { errorMessage } from '../../api/client';
+import Sheet from '../ui/Sheet';
+import Avatar from '../ui/Avatar';
 import { Notice, Skeleton } from '../ui';
+import { parentsApi } from '../../api/parents';
 
 // Today's pickup pass: the parent picks who is collecting, the QR names that person.
 export default function PassSheet({ open, onClose, student }) {
@@ -24,8 +25,8 @@ export default function PassSheet({ open, onClose, student }) {
     if (!guardianId) return;
     let alive = true;
     setImg('');
-    api.get(`/me/children/${student._id}/pickup-pass`, { params: { guardianId } })
-      .then(({ data }) => QRCode.toDataURL(data.qr, { width: 640, margin: 1, errorCorrectionLevel: 'M', color: { dark: '#101414', light: '#ffffff' } }))
+    parentsApi.pickupPass(student._id, guardianId)
+      .then((data) => QRCode.toDataURL(data.qr, { width: 640, margin: 1, errorCorrectionLevel: 'M', color: { dark: '#101414', light: '#ffffff' } }))
       .then((url) => alive && setImg(url))
       .catch((e) => alive && setError(errorMessage(e)));
     return () => { alive = false; };

@@ -1,8 +1,8 @@
 const { ZodError } = require('zod');
 const mongoose = require('mongoose');
-const { HttpError } = require('../utils/errors');
+const { HttpError } = require('../shared/errors');
 
-// eslint-disable-next-line no-unused-vars
+// Express recognises an error handler by its four arguments, so _next must stay.
 function errorHandler(err, _req, res, _next) {
   if (err instanceof HttpError) {
     return res.status(err.status).json({ error: { code: err.code, message: err.message, details: err.details } });

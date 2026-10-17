@@ -2,13 +2,15 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Trash2, Plus } from 'lucide-react';
-import { api, errorMessage } from '../../lib/api';
-import { useToast } from '../../components/Toast';
+import { errorMessage } from '../../api/client';
+import { useToast } from '../../components/ui/Toast';
 import { Button, Card, Input, Notice, PageTitle, Skeleton } from '../../components/ui';
+import { schoolApi, schoolQuery } from '../../api/school';
+import { keys } from '../../api/keys';
 
 export default function Settings() {
   const { t } = useTranslation();
-  const school = useQuery({ queryKey: ['school'], queryFn: () => api.get('/school').then((r) => r.data.school) });
+  const school = useQuery(schoolQuery());
   if (school.isLoading) return <Skeleton className="h-96" />;
   if (school.error) return <Notice tone="error">{t('errors.network')}</Notice>;
   return <SettingsForm key={school.data.updatedAt} school={school.data} />;
@@ -26,13 +28,13 @@ function SettingsForm({ school }) {
   });
   const [error, setError] = useState('');
   const save = useMutation({
-    mutationFn: () => api.patch('/school', {
+    mutationFn: () => schoolApi.update({
       name: f.name, udiseCode: f.udiseCode, district: f.district, academicYear: f.academicYear,
       markingWindow: { start: f.start, end: f.end },
       alertThreshold: Number(f.alertThreshold), consecutiveAbsenceAlert: Number(f.consecutiveAbsenceAlert),
       holidays: f.holidays.filter((h) => h.date && h.name),
     }),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['school'] }); toast(t('admin.saved')); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: keys.school }); toast(t('admin.saved')); },
     onError: (e) => setError(errorMessage(e)),
   });
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });

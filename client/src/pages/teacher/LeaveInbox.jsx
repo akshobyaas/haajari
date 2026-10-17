@@ -1,21 +1,23 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Phone } from 'lucide-react';
-import { api, errorMessage } from '../../lib/api';
+import { errorMessage } from '../../api/client';
 import { classLabel, prettyPhone } from '../../lib/format';
 import { fmtDay } from '../../lib/dates';
-import { useToast } from '../../components/Toast';
+import { useToast } from '../../components/ui/Toast';
 import { Button, Card, Notice, PageTitle, Skeleton } from '../../components/ui';
-import Avatar from '../../components/Avatar';
+import Avatar from '../../components/ui/Avatar';
+import { leaveApi, leaveQuery } from '../../api/leave';
+import { keys } from '../../api/keys';
 
 export default function LeaveInbox() {
   const { t } = useTranslation();
   const qc = useQueryClient();
   const toast = useToast((s) => s.show);
-  const q = useQuery({ queryKey: ['leave'], queryFn: () => api.get('/leave').then((r) => r.data.leaves) });
+  const q = useQuery(leaveQuery());
   const decide = useMutation({
-    mutationFn: ({ id, decision }) => api.patch(`/leave/${id}`, { decision }),
-    onSuccess: (_r, v) => { qc.invalidateQueries({ queryKey: ['leave'] }); qc.invalidateQueries({ queryKey: ['roster'] }); toast(t(v.decision === 'approved' ? 'leaveInbox.approved' : 'leaveInbox.rejected')); },
+    mutationFn: ({ id, decision }) => leaveApi.decide(id, decision),
+    onSuccess: (_r, v) => { qc.invalidateQueries({ queryKey: keys.leave }); qc.invalidateQueries({ queryKey: keys.roster }); toast(t(v.decision === 'approved' ? 'leaveInbox.approved' : 'leaveInbox.rejected')); },
     onError: (e) => toast(errorMessage(e)),
   });
   const pending = q.data?.filter((l) => l.status === 'pending') || [];

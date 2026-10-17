@@ -1,4 +1,4 @@
-const { todayIn, addDays, closedReason } = require('../src/utils/dates');
+const { todayIn, addDays, closedReason } = require('../src/shared/dates');
 const { School, User, ClassRoom, Student, Attendance, AuditLog, LeaveRequest, PickupLog, Notification, PushSubscription, RiskFlag, GRADES, defaultModeFor } = require('../src/models');
 
 // Deterministic random numbers so every seed produces the same demo school.
@@ -146,12 +146,12 @@ async function seed({ log = console.log, days = 40 } = {}) {
   await LeaveRequest.create({ schoolId: school._id, studentId: asker._id, from, to: addDays(from, 1), reason: 'Cousin’s wedding in Mandya', requestedBy: asker.parentIds[0] });
 
   // Find children who need follow-up, so the dashboard has them from the start.
-  const risk = await require('../src/workers/risk').evaluateRisk(await School.findById(school._id));
+  const risk = await require('../src/modules/risk/risk.service').evaluateRisk(await School.findById(school._id));
 
   const summary = { atRisk: risk.flagged, school: school.name, classes: classes.length, teachers: teachers.length, students: studentCount, parents: parentSeq - 1, attendanceRecords: marks };
   // The block office (approver) and one school waiting for approval, for the demo.
-  await require('../src/utils/approver').ensureApprover({ email: DEMO.approverEmail, password: DEMO.approverPassword, name: 'BEO Office, Mysuru North' });
-  await require('../src/services/schools').createSchool({
+  await require('../src/modules/platform/approver.service').ensureApprover({ email: DEMO.approverEmail, password: DEMO.approverPassword, name: 'BEO Office, Mysuru North' });
+  await require('../src/modules/platform/platform.service').createSchool({
     school: { name: 'Government Higher Primary School, Kuvempunagar', udiseCode: '29261200245', district: 'Mysuru', block: 'Mysuru North' },
     hm: { name: 'Smt. Lakshmi Devi', email: 'hm@ghps-kuvempunagar.in', phone: '9300000001', password: 'Haajari@2026' },
     note: 'We have 6 classes and about 180 children.',

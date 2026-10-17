@@ -1,9 +1,9 @@
 const crypto = require('crypto');
 const { api, start, stop, auth, loginPin, DEMO } = require('./helpers');
 const { ClassRoom, Attendance, School, Student, User, Notification, PickupLog } = require('../src/models');
-const { todayIn, addDays, closedReason, nowTimeIn } = require('../src/utils/dates');
-const { runAbsenceAlerts, runLatePickupAlerts } = require('../src/workers/alerts');
-const { setSender } = require('../src/services/push');
+const { todayIn, addDays, closedReason, nowTimeIn } = require('../src/shared/dates');
+const { runAbsenceAlerts, runLatePickupAlerts } = require('../src/modules/notifications/alerts.service');
+const { setSender } = require('../src/modules/notifications/push.service');
 
 let teacher, parent, parentUser, fourA, riya, pushes;
 const today = todayIn('Asia/Kolkata');
@@ -122,7 +122,7 @@ describe('leave requests', () => {
 
 describe('leave in a period-wise class', () => {
   test('approved leave marks every period, so no subject teacher starts the child as present', async () => {
-    const { applyLeave } = require('../src/services/leave');
+    const { applyLeave } = require('../src/modules/leave/leave.service');
     const ten = await ClassRoom.findOne({ grade: '10' });
     const child = await Student.findOne({ classId: ten._id });
     let day = addDays(today, 1);

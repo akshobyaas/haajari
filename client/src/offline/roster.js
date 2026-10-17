@@ -1,5 +1,5 @@
 import { db, rosterKey } from './db';
-import { api } from '../lib/api';
+import { classesApi } from '../api/classes';
 
 /**
  * Network first, phone cache second. The class list (students) rarely changes, so a
@@ -7,7 +7,7 @@ import { api } from '../lib/api';
  */
 export async function loadRoster(classId, date) {
   try {
-    const { data } = await api.get(`/classes/${classId}/roster`, { params: date ? { date } : {} });
+    const data = await classesApi.roster(classId, date);
     const now = Date.now();
     await db.rosters.bulkPut([
       { key: rosterKey(classId, data.date), classId, cachedAt: now, data },
@@ -28,7 +28,7 @@ export async function loadRoster(classId, date) {
 
 export async function loadClasses() {
   try {
-    const { data } = await api.get('/classes');
+    const data = await classesApi.overview();
     await db.cache.put({ key: 'classes', data, cachedAt: Date.now() });
     return { ...data, fromCache: false };
   } catch (e) {
@@ -47,7 +47,7 @@ export async function prefetchRosters(classIds) {
 export function localToday(tz = 'Asia/Kolkata') {
   return new Intl.DateTimeFormat('en-CA', { timeZone: tz, year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date());
 }
-export function localTime(tz = 'Asia/Kolkata') {
+function localTime(tz = 'Asia/Kolkata') {
   return new Intl.DateTimeFormat('en-GB', { timeZone: tz, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(new Date());
 }
 export const editNeedsReason = (school, date) => !(date === localToday(school.timezone) && localTime(school.timezone) <= school.markingWindow.end);

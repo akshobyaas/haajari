@@ -1,5 +1,5 @@
 const { ClassRoom, Student } = require('../models');
-const { forbidden, notFound } = require('../utils/errors');
+const { forbidden, notFound } = require('../shared/errors');
 
 // Class ids a teacher may see: classes they lead plus classes they teach a subject in.
 async function teacherClassIds(user) {

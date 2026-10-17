@@ -2,22 +2,24 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Plus, KeyRound } from 'lucide-react';
-import { api, errorMessage } from '../../lib/api';
+import { errorMessage } from '../../api/client';
 import { prettyPhone } from '../../lib/format';
-import Avatar from '../../components/Avatar';
-import Sheet from '../../components/Sheet';
-import { useToast } from '../../components/Toast';
+import Avatar from '../../components/ui/Avatar';
+import Sheet from '../../components/ui/Sheet';
+import { useToast } from '../../components/ui/Toast';
 import { Button, Card, Input, Notice, PageTitle, Skeleton } from '../../components/ui';
+import { usersApi, teachersQuery } from '../../api/users';
+import { keys } from '../../api/keys';
 
 export default function Teachers() {
   const { t } = useTranslation();
   const qc = useQueryClient();
   const toast = useToast((s) => s.show);
   const [adding, setAdding] = useState(false);
-  const teachers = useQuery({ queryKey: ['users', 'teacher'], queryFn: () => api.get('/users', { params: { role: 'teacher' } }).then((r) => r.data.users) });
+  const teachers = useQuery(teachersQuery());
   const reset = useMutation({
-    mutationFn: (id) => api.post(`/users/${id}/reset-pin`),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['users'] }); toast(t('admin.pinReset')); },
+    mutationFn: (id) => usersApi.resetPin(id),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: keys.users }); toast(t('admin.pinReset')); },
   });
 
   return (
@@ -58,8 +60,8 @@ function AddTeacher({ open, onClose }) {
   const [form, setForm] = useState({ name: '', phone: '', email: '' });
   const [error, setError] = useState('');
   const save = useMutation({
-    mutationFn: () => api.post('/users', { role: 'teacher', name: form.name, phone: form.phone, email: form.email || undefined }),
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['users'] }); toast(t('admin.saved')); setForm({ name: '', phone: '', email: '' }); onClose(); },
+    mutationFn: () => usersApi.createTeacher({ name: form.name, phone: form.phone, email: form.email || undefined }),
+    onSuccess: () => { qc.invalidateQueries({ queryKey: keys.users }); toast(t('admin.saved')); setForm({ name: '', phone: '', email: '' }); onClose(); },
     onError: (e) => setError(errorMessage(e)),
   });
   return (

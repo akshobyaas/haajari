@@ -36,8 +36,7 @@
     "pinTitle": "Choose a 4-digit PIN",
     "pinIntro": "Hello {{name}}. You will use this PIN to log in every day.",
     "confirmTitle": "Enter the same PIN again",
-    "mismatch": "The two PINs did not match. Choose your PIN again.",
-    "done": "PIN saved"
+    "mismatch": "The two PINs did not match. Choose your PIN again."
   },
   "nav": {
     "home": "Home",
@@ -55,25 +54,20 @@
   },
   "common": {
     "save": "Save",
-    "saving": "Saving…",
     "cancel": "Cancel",
-    "add": "Add",
-    "edit": "Edit",
     "remove": "Remove",
-    "close": "Close",
     "search": "Search",
-    "loading": "Loading…",
-    "retry": "Try again",
     "students": "{{count}} students",
     "students_one": "{{count}} student",
     "logOut": "Log out",
     "call": "Call",
-    "none": "None",
     "back": "Back",
     "offline": "No internet. Showing saved data.",
     "crashTitle": "This screen did not load",
     "crashBody": "Your saved attendance is safe on this phone. Reload to try again.",
-    "reload": "Reload"
+    "reload": "Reload",
+    "showPassword": "Show password",
+    "hidePassword": "Hide password"
   },
   "grade": {
     "PREKG": "Pre-KG",
@@ -92,7 +86,6 @@
     "classTeacher": "Class teacher",
     "subject": "{{subject}} teacher",
     "noClasses": "No classes are assigned to you yet. Ask the headmaster to add you as a class teacher.",
-    "roster": "Students",
     "roll": "Roll {{n}}"
   },
   "parent": {
@@ -151,16 +144,9 @@
     "alertsReady": "Alerts are on"
   },
   "admin": {
-    "setupTitle": "School setup",
-    "setupIntro": "Finish these before teachers start marking attendance.",
-    "statClasses": "Classes",
-    "statStudents": "Students",
-    "statTeachers": "Teachers",
-    "statParents": "Parents linked",
     "checkTeacher": "{{count}} classes have no class teacher",
     "checkSats": "{{count}} students have no SATS ID",
     "checkParent": "{{count}} students have no parent number",
-    "allGood": "Setup is complete.",
     "fix": "Fix",
     "addClass": "Add class",
     "editClass": "Edit class",
@@ -192,7 +178,6 @@
     "satsId": "SATS ID (9 digits)",
     "parentName": "Parent name",
     "parentPhone": "Parent mobile",
-    "relation": "Relation",
     "removeStudent": "Remove from school",
     "removeReason": "Reason, e.g. TC issued",
     "noStudents": "No students here yet. Add one, or import your register from a spreadsheet.",
@@ -244,7 +229,6 @@
   "mark": {
     "title": "Mark attendance",
     "today": "Today",
-    "day": "Day",
     "period": "Period {{n}}",
     "hint": "Everyone starts as present (P), children on approved leave as Lv. Tap A for absent, L for late.",
     "save": "Save attendance",
@@ -283,7 +267,6 @@
     "pending_one": "1 mark waiting to send",
     "now": "Send now",
     "sending": "Sending…",
-    "allSent": "All marks sent",
     "needsAttention": "Some marks need your attention"
   },
   "home": {
@@ -337,15 +320,13 @@
     "cameraError": "Camera is not available. Choose the person from the list instead.",
     "at": "Pickup at {{time}}",
     "needOnline": "Handing over needs internet, so the parent is told at once.",
-    "arrivedAt": "Arrived {{time}}",
     "by": "{{name}}, {{time}}",
     "notAPass": "This QR code is not a Haajari pickup pass.",
     "otherClass": "This pass is for a child in another class."
   },
   "alerts": {
     "title": "Alerts",
-    "empty": "No alerts yet.",
-    "markAll": "Mark all read"
+    "empty": "No alerts yet."
   },
   "dash": {
     "inSchool": "in school now",
@@ -362,7 +343,6 @@
     "copyCook": "Send to cook",
     "copied": "Copied. Paste it in WhatsApp.",
     "mealMsg": "Mid-day meal {{date}}: {{total}} children",
-    "drill": "Emergency headcount",
     "drillBtn": "Who is in school now",
     "classesToday": "Present today by class",
     "belowLine": "Below {{n}}%",
@@ -376,8 +356,7 @@
     "closed": "No school today ({{reason}}).",
     "updated": "Updated {{time}}",
     "present": "present",
-    "absent": "absent",
-    "notMarked": "not marked"
+    "absent": "absent"
   },
   "risk": {
     "title": "Children to follow up",
@@ -438,7 +417,6 @@
     "intro": "Children marked present and not yet gone home. Use it to count during a drill or emergency.",
     "total": "{{count}} in school",
     "byClass": "{{count}} in school",
-    "none": "No one in school.",
     "print": "Print"
   },
   "settings": {

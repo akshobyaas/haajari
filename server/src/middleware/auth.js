@@ -1,7 +1,7 @@
 const { User, School } = require('../models');
-const { verify } = require('../utils/token');
-const { unauthorized, forbidden } = require('../utils/errors');
-const { assertSchoolOpen } = require('../utils/schoolStatus');
+const { verify } = require('../shared/token');
+const { unauthorized, forbidden } = require('../shared/errors');
+const { assertSchoolOpen } = require('../shared/schoolStatus');
 
 // Attaches req.user (a full User document) when a valid Bearer token is sent.
 async function requireAuth(req, _res, next) {

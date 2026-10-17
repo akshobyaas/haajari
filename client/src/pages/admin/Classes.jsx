@@ -2,17 +2,20 @@ import { useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Plus } from 'lucide-react';
-import { api, errorMessage } from '../../lib/api';
+import { errorMessage } from '../../api/client';
 import { GRADES, gradeLabel, firstName } from '../../lib/format';
-import ClassSlate from '../../components/ClassSlate';
-import Sheet from '../../components/Sheet';
-import { useToast } from '../../components/Toast';
+import ClassSlate from '../../components/attendance/ClassSlate';
+import Sheet from '../../components/ui/Sheet';
+import { useToast } from '../../components/ui/Toast';
 import { Button, Select, Input, Notice, PageTitle, Skeleton } from '../../components/ui';
+import { classesApi, classesQuery } from '../../api/classes';
+import { teachersQuery } from '../../api/users';
+import { keys } from '../../api/keys';
 
 export default function Classes() {
   const { t } = useTranslation();
   const [editing, setEditing] = useState(null); // null | {} (new) | class
-  const classes = useQuery({ queryKey: ['classes'], queryFn: () => api.get('/classes').then((r) => r.data.classes) });
+  const classes = useQuery(classesQuery());
 
   return (
     <div>
@@ -33,7 +36,7 @@ function ClassForm({ cls, onClose }) {
   const qc = useQueryClient();
   const toast = useToast((s) => s.show);
   const isNew = cls && !cls._id;
-  const teachers = useQuery({ queryKey: ['users', 'teacher'], queryFn: () => api.get('/users', { params: { role: 'teacher' } }).then((r) => r.data.users), enabled: Boolean(cls) });
+  const teachers = useQuery({ ...teachersQuery(), enabled: Boolean(cls) });
   const [form, setForm] = useState({});
   const [error, setError] = useState('');
   const key = cls?._id || 'new';
@@ -48,9 +51,9 @@ function ClassForm({ cls, onClose }) {
     mutationFn: () => {
       const body = { ...form, classTeacherId: form.classTeacherId || null };
       if (!body.mode) delete body.mode;
-      return isNew ? api.post('/classes', body) : api.patch(`/classes/${cls._id}`, body);
+      return isNew ? classesApi.create(body) : classesApi.update(cls._id, body);
     },
-    onSuccess: () => { qc.invalidateQueries({ queryKey: ['classes'] }); qc.invalidateQueries({ queryKey: ['summary'] }); toast(t('admin.saved')); onClose(); },
+    onSuccess: () => { qc.invalidateQueries({ queryKey: keys.classes }); qc.invalidateQueries({ queryKey: keys.summary }); toast(t('admin.saved')); onClose(); },
     onError: (e) => setError(errorMessage(e)),
   });
   const set = (k) => (e) => setForm({ ...form, [k]: e.target.value });

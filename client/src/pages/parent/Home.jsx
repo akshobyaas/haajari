@@ -3,25 +3,24 @@ import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { Phone, QrCode, CalendarDays, ChevronRight } from 'lucide-react';
-import { api } from '../../lib/api';
-import { useAuth } from '../../lib/auth';
+import { useAuth } from '../../stores/auth';
 import { classLabel, firstName } from '../../lib/format';
 import { reasonText } from '../../lib/dates';
 import { Card, Skeleton, Notice } from '../../components/ui';
-import Avatar from '../../components/Avatar';
+import Avatar from '../../components/ui/Avatar';
 import TodayStatus from '../../components/parent/TodayStatus';
 import ReasonButtons from '../../components/parent/ReasonButtons';
 import AlertsPrompt from '../../components/parent/AlertsPrompt';
 import PassSheet from '../../components/parent/PassSheet';
-import { live } from '../../lib/dataSaver';
+import { live } from '../../stores/dataSaver';
+import { childrenQuery } from '../../api/parents';
 
 export default function ParentHome() {
   const { t } = useTranslation();
   const user = useAuth((s) => s.user);
   const [passFor, setPassFor] = useState(null);
   const { data, isLoading, error } = useQuery({
-    queryKey: ['children'],
-    queryFn: () => api.get('/me/children').then((r) => r.data.children),
+    ...childrenQuery(),
     refetchInterval: () => live(60_000),
   });
 

@@ -1,5 +1,5 @@
 import { db } from './db';
-import { api } from '../lib/api';
+import { attendanceApi } from '../api/attendance';
 
 const newId = () => (crypto.randomUUID ? crypto.randomUUID() : `${Date.now()}-${Math.random().toString(36).slice(2)}`);
 
@@ -27,8 +27,6 @@ export async function saveMarks({ classId, date, period, statuses, serverMarks =
 
 let running = null;
 let again = false; // marks saved while a sync was already running
-const listeners = new Set();
-export const onSyncResult = (fn) => { listeners.add(fn); return () => listeners.delete(fn); };
 
 /** Push every unsynced batch to the server. Safe to call often; runs one at a time. */
 export function syncNow() {
@@ -47,12 +45,12 @@ export function syncNow() {
       const { classId, date, period } = rows[0];
       const editReason = rows.find((r) => r.editReason)?.editReason || undefined;
       try {
-        const res = await api.post('/attendance/bulk', {
+        const res = await attendanceApi.saveBulk({
           classId, date, period, editReason,
           marks: rows.map(({ studentId, status, clientId, markedAt }) => ({ studentId, status, clientId, markedAt })),
         });
         await db.transaction('rw', db.marks, async () => {
-          for (const r of res.data.results) {
+          for (const r of res.results) {
             const row = await db.marks.get([classId, date, period, r.studentId]);
             if (!row || row.clientId !== r.clientId) continue; // changed again meanwhile; next sync sends it
             if (r.result === 'stale') await db.marks.update([classId, date, period, r.studentId], { status: r.current, synced: 1 });
@@ -60,7 +58,6 @@ export function syncNow() {
           }
         });
         sent += rows.length;
-        listeners.forEach((fn) => fn({ classId, date, period, ok: true }));
       } catch (e) {
         if (!e.response) break; // offline or server down: keep everything for later
         const code = e.response.data?.error?.code;
@@ -69,7 +66,6 @@ export function syncNow() {
         if (e.response.status >= 400 && e.response.status < 500) {
           await db.marks.bulkUpdate(rows.map((r) => ({ key: [r.classId, r.date, r.period, r.studentId], changes: { error: code === 'needs_reason' ? 'needs_reason' : message } })));
         }
-        listeners.forEach((fn) => fn({ classId, date, period, ok: false, code, message }));
       }
     }
     return { sent };

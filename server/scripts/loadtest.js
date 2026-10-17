@@ -12,7 +12,7 @@ const mongoose = require('mongoose');
 const env = require('../src/config/env');
 const { createApp } = require('../src/app');
 const { School, User, ClassRoom, Student, Attendance } = require('../src/models');
-const { todayIn, addDays, closedReason } = require('../src/utils/dates');
+const { todayIn, addDays, closedReason } = require('../src/shared/dates');
 
 const CLASSES = Number(process.env.CLASSES || 50);
 const PER_CLASS = Number(process.env.PER_CLASS || 40);

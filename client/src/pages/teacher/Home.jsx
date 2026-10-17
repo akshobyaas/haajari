@@ -3,24 +3,26 @@ import { useQuery } from '@tanstack/react-query';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { useNavigate, Link } from 'react-router-dom';
 import { CalendarOff, ChevronRight, HeartHandshake, FileSpreadsheet } from 'lucide-react';
-import { api } from '../../lib/api';
 import { useTranslation } from 'react-i18next';
-import { useAuth } from '../../lib/auth';
+import { useAuth } from '../../stores/auth';
 import { firstName } from '../../lib/format';
 import { db } from '../../offline/db';
 import { loadClasses, prefetchRosters } from '../../offline/roster';
-import ClassSlate from '../../components/ClassSlate';
-import SyncBar from '../../components/SyncBar';
+import ClassSlate from '../../components/attendance/ClassSlate';
+import SyncBar from '../../components/attendance/SyncBar';
 import { Skeleton, Notice } from '../../components/ui';
+import { leaveQuery } from '../../api/leave';
+import { riskQuery } from '../../api/risk';
+import { keys } from '../../api/keys';
 
 export default function TeacherHome() {
   const { t, i18n } = useTranslation();
   const user = useAuth((s) => s.user);
   const navigate = useNavigate();
-  const { data, isLoading, error } = useQuery({ queryKey: ['classes'], queryFn: loadClasses });
-  const leave = useQuery({ queryKey: ['leave'], queryFn: () => api.get('/leave', { params: { status: 'pending' } }).then((r) => r.data.leaves) });
+  const { data, isLoading, error } = useQuery({ queryKey: keys.classOverview, queryFn: loadClasses });
+  const leave = useQuery(leaveQuery('pending'));
   const pendingLeave = (leave.data || []).filter((l) => l.status === 'pending').length;
-  const risk = useQuery({ queryKey: ['risk'], queryFn: () => api.get('/risk').then((r) => r.data.flags) });
+  const risk = useQuery({ ...riskQuery(), select: (d) => d.flags });
   const onPhone = useLiveQuery(
     () => (data?.date ? db.marks.where('synced').equals(0).filter((m) => m.date === data.date).toArray() : []),
     [data?.date],

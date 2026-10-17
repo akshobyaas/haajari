@@ -2,18 +2,19 @@ import { useQuery } from '@tanstack/react-query';
 import { useParams, Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, ChevronRight } from 'lucide-react';
-import { api } from '../../lib/api';
 import { loadRoster } from '../../offline/roster';
 import { classLabel } from '../../lib/format';
 import { STATUS_STYLE } from '../../lib/status';
 import { Card, Skeleton, Notice } from '../../components/ui';
+import { historyQuery } from '../../api/attendance';
+import { keys } from '../../api/keys';
 
 // Last 30 days for one class; tap a day to open it on the marking screen.
 export default function ClassHistory() {
   const { id } = useParams();
   const { t, i18n } = useTranslation();
-  const roster = useQuery({ queryKey: ['roster', id, ''], queryFn: () => loadRoster(id) });
-  const days = useQuery({ queryKey: ['history', id], queryFn: () => api.get(`/attendance/class/${id}/history`).then((r) => r.data.days) });
+  const roster = useQuery({ queryKey: keys.rosterFor(id), queryFn: () => loadRoster(id) });
+  const days = useQuery(historyQuery(id));
   const fmt = new Intl.DateTimeFormat(i18n.language === 'en' ? 'en-IN' : `${i18n.language}-IN`, { weekday: 'short', day: 'numeric', month: 'short', timeZone: 'UTC' });
   const backdate = roster.data?.school.teacherBackdateDays ?? 7;
   const today = roster.data?.today;

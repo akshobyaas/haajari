@@ -3,9 +3,9 @@ import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { motion } from 'motion/react';
 import { ArrowLeft, Hourglass } from 'lucide-react';
-import BoardHeader from '../components/BoardHeader';
-import SchoolForm from '../components/SchoolForm';
-import { api } from '../lib/api';
+import BoardHeader from '../components/layout/BoardHeader';
+import SchoolForm from '../components/schools/SchoolForm';
+import { platformApi } from '../api/platform';
 
 // Public page: a headmaster asks to put their school on Haajari; the block office approves it.
 export default function RegisterSchool() {
@@ -33,7 +33,7 @@ export default function RegisterSchool() {
               <SchoolForm
                 submitLabel={t('register.submit')}
                 onSubmit={async (body) => {
-                  await api.post('/public/school-requests', body);
+                  await platformApi.requestSchool(body);
                   setSent({ name: body.school.name, email: body.hm.email });
                   window.scrollTo({ top: 0, behavior: 'smooth' });
                 }}

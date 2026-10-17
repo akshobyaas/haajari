@@ -2,13 +2,16 @@ import { useEffect, useState } from 'react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Plus, Upload, Search, AlertTriangle } from 'lucide-react';
-import { api, errorMessage } from '../../lib/api';
+import { errorMessage } from '../../api/client';
 import { classLabel, prettyPhone } from '../../lib/format';
-import Avatar from '../../components/Avatar';
-import Sheet from '../../components/Sheet';
+import Avatar from '../../components/ui/Avatar';
+import Sheet from '../../components/ui/Sheet';
 import ImportSheet from './ImportSheet';
-import { useToast } from '../../components/Toast';
+import { useToast } from '../../components/ui/Toast';
 import { Button, Card, Input, Select, Notice, PageTitle, Skeleton } from '../../components/ui';
+import { studentsApi, studentsQuery } from '../../api/students';
+import { classesQuery } from '../../api/classes';
+import { keys } from '../../api/keys';
 
 function useDebounced(value, ms = 300) {
   const [v, setV] = useState(value);
@@ -18,7 +21,7 @@ function useDebounced(value, ms = 300) {
 
 export default function Students() {
   const { t } = useTranslation();
-  const classes = useQuery({ queryKey: ['classes'], queryFn: () => api.get('/classes').then((r) => r.data.classes) });
+  const classes = useQuery(classesQuery());
   const [classId, setClassId] = useState('');
   const [search, setSearch] = useState('');
   const [editing, setEditing] = useState(null);
@@ -28,8 +31,7 @@ export default function Students() {
   const activeClass = classId || (q ? '' : firstClass);
 
   const students = useQuery({
-    queryKey: ['students', activeClass || 'all', q],
-    queryFn: () => api.get('/students', { params: { classId: activeClass || undefined, search: q || undefined } }).then((r) => r.data.students),
+    ...studentsQuery({ classId: activeClass, search: q }),
     enabled: Boolean(activeClass || q),
   });
 
@@ -108,7 +110,7 @@ function StudentForm({ student, classes, onClose }) {
   }
   if (!student && formKey) setFormKey(null);
 
-  const done = (msg) => { qc.invalidateQueries({ queryKey: ['students'] }); qc.invalidateQueries({ queryKey: ['classes'] }); qc.invalidateQueries({ queryKey: ['summary'] }); toast(msg); onClose(); };
+  const done = (msg) => { qc.invalidateQueries({ queryKey: keys.students }); qc.invalidateQueries({ queryKey: keys.classes }); qc.invalidateQueries({ queryKey: keys.summary }); toast(msg); onClose(); };
   const save = useMutation({
     mutationFn: () => {
       const body = {
@@ -116,13 +118,13 @@ function StudentForm({ student, classes, onClose }) {
         rollNo: form.rollNo ? Number(form.rollNo) : undefined, gender: form.gender || undefined, dob: form.dob || undefined, satsId: form.satsId,
         parent: form.parentPhone ? { name: form.parentName || 'Parent', phone: form.parentPhone, relation: form.relation } : undefined,
       };
-      return isNew ? api.post('/students', body) : api.patch(`/students/${student._id}`, body);
+      return isNew ? studentsApi.create(body) : studentsApi.update(student._id, body);
     },
     onSuccess: () => done(t('admin.saved')),
     onError: (e) => setError(errorMessage(e)),
   });
   const remove = useMutation({
-    mutationFn: () => api.delete(`/students/${student._id}`, { data: { reason } }),
+    mutationFn: () => studentsApi.remove(student._id, reason),
     onSuccess: () => done(t('admin.saved')),
     onError: (e) => setError(errorMessage(e)),
   });

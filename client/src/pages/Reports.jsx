@@ -2,14 +2,15 @@ import { useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslation } from 'react-i18next';
 import { Download, Printer, Phone } from 'lucide-react';
-import { api, errorMessage } from '../lib/api';
-import { useAuth } from '../lib/auth';
-import { download } from '../lib/download';
+import { errorMessage } from '../api/client';
+import { useAuth } from '../stores/auth';
 import { classLabel } from '../lib/format';
 import { fmtMonth } from '../lib/dates';
 import { localToday } from '../offline/roster';
-import { useToast } from '../components/Toast';
+import { useToast } from '../components/ui/Toast';
 import { Button, Card, Input, Notice, PageTitle, Select, Skeleton } from '../components/ui';
+import { classesQuery } from '../api/classes';
+import { download, registerQuery, shortageQuery } from '../api/reports';
 
 export default function Reports() {
   const { t } = useTranslation();
@@ -52,15 +53,11 @@ const SHORT = { P: 'P', A: 'A', L: 'L', LV: 'Lv' };
 // The monthly register, laid out like the paper one. Prints on one landscape page per class.
 function Register() {
   const { t } = useTranslation();
-  const classes = useQuery({ queryKey: ['classes'], queryFn: () => api.get('/classes').then((r) => r.data.classes) });
+  const classes = useQuery(classesQuery());
   const [classId, setClassId] = useState('');
   const [month, setMonth] = useState(localToday().slice(0, 7));
   const cid = classId || classes.data?.[0]?._id;
-  const q = useQuery({
-    queryKey: ['register', cid, month],
-    queryFn: () => api.get('/reports/register', { params: { classId: cid, month } }).then((r) => r.data),
-    enabled: Boolean(cid),
-  });
+  const q = useQuery({ ...registerQuery(cid, month), enabled: Boolean(cid) });
   const [busy, run] = useDownload();
   const reg = q.data;
 
@@ -137,7 +134,7 @@ function Register() {
 function Shortage() {
   const { t } = useTranslation();
   const [threshold, setThreshold] = useState(75);
-  const q = useQuery({ queryKey: ['shortage', threshold], queryFn: () => api.get('/reports/shortage', { params: { threshold } }).then((r) => r.data) });
+  const q = useQuery(shortageQuery(threshold));
   const [busy, run] = useDownload();
   return (
     <div className="max-w-3xl">

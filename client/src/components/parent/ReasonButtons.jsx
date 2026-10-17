@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useQueryClient } from '@tanstack/react-query';
 import { Thermometer, Users, Bus, MoreHorizontal } from 'lucide-react';
-import { api, errorMessage } from '../../lib/api';
+import { errorMessage } from '../../api/client';
 import { Notice } from '../ui';
+import { parentsApi } from '../../api/parents';
+import { keys } from '../../api/keys';
 
 const OPTIONS = [
   ['sick', Thermometer],
@@ -22,9 +24,9 @@ export default function ReasonButtons({ attendanceId, name }) {
     setBusy(reason);
     setError('');
     try {
-      await api.post(`/me/absences/${attendanceId}/reason`, { reason });
-      qc.invalidateQueries({ queryKey: ['children'] });
-      qc.invalidateQueries({ queryKey: ['child-month'] });
+      await parentsApi.giveReason(attendanceId, reason);
+      qc.invalidateQueries({ queryKey: keys.children });
+      qc.invalidateQueries({ queryKey: keys.childMonth });
     } catch (e) {
       setError(errorMessage(e));
     } finally {

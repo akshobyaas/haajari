@@ -92,7 +92,9 @@ The same UDISE code cannot be registered twice, nor the same email or mobile. Th
 ## Tests
 
 ```bash
-npm test
+npm test                      # API tests
+npm --prefix server run lint  # lint the API
+npm --prefix client run lint  # lint the app
 ```
 
 50 API tests cover login (email, PIN, OTP setup), role access, spreadsheet import, alerts, leave, pickup and attendance:
@@ -103,26 +105,20 @@ Sundays and holidays are refused, and a class of 40 saves in one request.
 ## What is where
 
 ```
-server/                 Node + Express + MongoDB API
-  src/models/           School, User, ClassRoom, Student, Attendance, AuditLog,
-                        LeaveRequest, PickupLog, Notification
-  src/routes/           auth, school, classes, students, users, me, dashboard
-  src/middleware/       JWT auth, role checks, class/student access rules
-  src/utils/            OTP, spreadsheet import, validation
-  src/services/         attendance saving (idempotent), leave, notifications, Web Push
-  src/workers/          absence and late-pickup alerts (every 30 s), at-risk check (daily 17:00)
-  src/services/stats.js day overview, trend, monthly register; excel.js for downloads
-  seed/                 demo school: KPS Hebbal, Mysuru — 13 classes, 389 students, 40 days of attendance
-  tests/                Jest + Supertest
-client/                 React + Vite + Tailwind
-  src/pages/            Login, Setup (OTP + PIN), Alerts, teacher/ (MarkAttendance, ClassHistory,
-                        PickupBoard, LeaveInbox), parent/ (Home, Child), admin/ (Dashboard),
-                        AtRisk, Reports, InSchool
-  src/sw.js             service worker: offline start, notifications with reply buttons
-  src/offline/          IndexedDB storage and the sync queue
-  src/components/       PinPad, ClassSlate, AppShell, Sheet, ...
-  src/i18n/             kn.json, en.json, hi.json
+server/src/
+  api/index.js        the API in one table: URL → who may call it → module
+  modules/<feature>/  routes (thin) → service (rules + database) → schemas (zod)
+  models/             Mongoose schemas      shared/   dates, errors, validation, tokens
+  config/env.js       every setting, checked at start-up      jobs/   alerts, at-risk check
+client/src/
+  api/                server calls + cache keys, one file per feature
+  pages/              screens by role: teacher/, parent/, admin/, office/
+  components/         ui/ (design kit), layout/, attendance/, pickup/, schools/, parent/, charts/
+  stores/             client state (session, low-data mode)    offline/   IndexedDB + sync queue
+  i18n/               kn, en, hi
 ```
+
+Full guide, with the rules for adding features: **[docs/ARCHITECTURE.md](docs/ARCHITECTURE.md)**.
 
 ## Phase 1 — what it solves
 

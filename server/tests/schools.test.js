@@ -109,7 +109,7 @@ describe('adding a school directly', () => {
 
 describe('approver account from settings', () => {
   test('is created once, and its password follows the setting', async () => {
-    const { ensureApprover } = require('../src/utils/approver');
+    const { ensureApprover } = require('../src/modules/platform/approver.service');
     await ensureApprover({ email: 'beo@mysuru.in', password: 'First@2026' });
     expect((await login('beo@mysuru.in', 'First@2026')).status).toBe(200);
     await ensureApprover({ email: 'beo@mysuru.in', password: 'Second@2026' });

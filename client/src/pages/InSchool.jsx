@@ -2,16 +2,16 @@ import { useQuery } from '@tanstack/react-query';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import { ArrowLeft, Printer } from 'lucide-react';
-import { api } from '../lib/api';
 import { classLabel } from '../lib/format';
 import { fmtTime } from '../lib/dates';
 import { Card, Skeleton, Notice } from '../components/ui';
-import { live } from '../lib/dataSaver';
+import { live } from '../stores/dataSaver';
+import { todayQuery } from '../api/dashboard';
 
 // Emergency headcount: everyone marked present who has not gone home, class by class. Printable.
 export default function InSchool() {
   const { t } = useTranslation();
-  const q = useQuery({ queryKey: ['dash-today'], queryFn: () => api.get('/dashboard/today').then((r) => r.data), refetchInterval: () => live(15_000) });
+  const q = useQuery({ ...todayQuery(), refetchInterval: () => live(15_000) });
   const d = q.data;
   return (
     <div className="print-area">
