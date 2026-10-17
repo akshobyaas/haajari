@@ -49,7 +49,12 @@ function useFinish() {
   const navigate = useNavigate();
   return (data) => {
     setSession(data);
-    if (data.user.language) setLanguage(data.user.language);
+    // A language picked on this screen wins over the saved one, and is saved to the profile.
+    let picked = null;
+    try { picked = sessionStorage.getItem('haajari.pickedLang'); sessionStorage.removeItem('haajari.pickedLang'); } catch { /* private mode */ }
+    if (picked && picked !== data.user.language) {
+      api.patch('/auth/me', { language: picked }).then((r) => useAuth.getState().setUser(r.data.user)).catch(() => {});
+    } else if (data.user.language) setLanguage(data.user.language);
     navigate(homeFor(data.user.role), { replace: true });
   };
 }

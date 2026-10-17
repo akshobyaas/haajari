@@ -7,7 +7,7 @@ services:
     plan: free
     region: singapore
     # --include=dev: NODE_ENV=production would otherwise skip Vite, which the build needs.
-    buildCommand: npm install --include=dev && npm --prefix server install --omit=dev && npm --prefix client install --include=dev && npm run build
+    buildCommand: npm install --include=dev && cd server && npm install --omit=dev && cd ../client && npm install --include=dev && cd .. && npm run build
     startCommand: npm start
     healthCheckPath: /api/health
     envVars:

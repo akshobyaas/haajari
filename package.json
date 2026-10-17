@@ -2,7 +2,9 @@
   "name": "haajari",
   "private": true,
   "scripts": {
-    "setup": "npm install && npm --prefix server install && npm --prefix client install",
+    "setup": "npm install && npm run setup:server && npm run setup:client",
+    "setup:server": "cd server && npm install",
+    "setup:client": "cd client && npm install",
     "dev": "concurrently -n api,app -c green,yellow \"npm --prefix server run dev:memory\" \"npm --prefix client run dev\"",
     "dev:mongo": "concurrently -n api,app -c green,yellow \"npm --prefix server run dev\" \"npm --prefix client run dev\"",
     "seed": "npm --prefix server run seed",

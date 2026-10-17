@@ -8,6 +8,8 @@ export default function LanguageSwitch({ onBoard = false }) {
   const { token, setUser } = useAuth();
   const choose = async (lng) => {
     setLanguage(lng);
+    // Before login, remember the choice so login keeps it instead of the saved profile language.
+    if (!token) { try { sessionStorage.setItem('haajari.pickedLang', lng); } catch { /* private mode */ } }
     if (token) {
       try { const r = await api.patch('/auth/me', { language: lng }); setUser(r.data.user); } catch { /* keep local choice */ }
     }
