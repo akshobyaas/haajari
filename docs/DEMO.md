@@ -9,7 +9,7 @@ Two screens side by side: a laptop (headmaster) and a phone or a narrow browser 
 - [ ] Laptop: log in as headmaster, `hm@kps-mysuru.in` / `Haajari@2026`. Leave it on the dashboard.
 - [ ] Phone: log in as teacher `9000000007`, PIN `1234`. Open 4-A once (this saves the class on the phone), go back.
 - [ ] Second phone or window: parent `9100000001`, PIN `1234`.
-- [ ] Have the backup video (`docs/haajari-demo.mp4`) open in another tab, in case of network trouble.
+- [ ] Have the backup video (`haajari-demo.mp4`) open in another tab, in case of network trouble.
 - [ ] If you showed the demo earlier today, reset the data (see DEPLOY.md) so 4-A is unmarked.
 
 ## Script
@@ -21,8 +21,8 @@ Two screens side by side: a laptop (headmaster) and a phone or a narrow browser 
 | 1:10 | Phone: turn on airplane mode. Open 4-A. Tap 3 children (absent), one twice (late). Save. | "Everyone starts present; 40 children, 5 taps. No network: it says saved on this phone." |
 | 1:50 | Turn airplane mode off. Ticks appear. Laptop: dashboard updates (4-A now counted). | "Synced in the background. If the phone sends twice, the server keeps one copy; we tested 50 classes sending at once, twice." **(Implementation)** |
 | 2:30 | Parent phone: Alerts. Riya is absent. Tap **Sick**. | "Parents hear within about 2 minutes. The delay means a mis-tap the teacher fixes never alarms anyone." |
-| 3:00 | Teacher phone: open 4-A again; Riya's tile shows *Sick*. | "The reason reaches the teacher; no phone calls needed." |
-| 3:20 | Teacher: tap Riya three times to make her present → Save → reason sheet → *Came late* → save. Press and hold her tile. | "After the marking time, changes need a reason and are logged: who, when, why." |
+| 3:00 | Teacher phone: open 4-A again; *Sick* shows under Riya's name. | "The reason reaches the teacher; no phone calls needed." |
+| 3:20 | Teacher: tap **P** next to Riya to make her present → Save → reason sheet → *Came late* → save. Press and hold her name. | "After the marking time, changes need a reason and are logged: who, when, why." |
 | 3:50 | Laptop: dashboard. Point at registers taken, mid-day meal count, class bars. Click **Who is in school now**. | "The headmaster sees which classes are pending and can call the teacher. The meal count goes to the cook on WhatsApp. In a fire drill this is the list." |
 | 4:30 | Laptop: **Follow-up**. Open one child. Click *Visited home*, type a note, save. | "Children absent 3 days in a row or below 75% are flagged every evening, like Delhi's early-warning programme." |
 | 5:00 | Laptop: **Reports** → monthly register for 4-A → Print preview. Then SATS export. | "This is the paper register, filled in. Totals are checked against the raw data in our tests. The SATS file saves double entry." |

@@ -11,8 +11,8 @@ import { saveMarks, retryBatch, discardBatch } from '../../offline/sync';
 import { api } from '../../lib/api';
 import { classLabel } from '../../lib/format';
 import { reasonText } from '../../lib/dates';
-import { nextStatus, STATUS_STYLE } from '../../lib/status';
-import StudentTile from '../../components/StudentTile';
+import { STATUS_STYLE } from '../../lib/status';
+import StudentRow from '../../components/StudentRow';
 import Confetti from '../../components/Confetti';
 import Sheet from '../../components/Sheet';
 import { useToast } from '../../components/Toast';
@@ -83,7 +83,7 @@ export default function MarkAttendance() {
   const pendingCount = localRows.filter((m) => !m.synced).length;
   const closed = r && (r.closed || (r.school && isClosed(r.school, theDate)));
 
-  const tap = (sid) => setDraft((d) => ({ ...d, [sid]: nextStatus(statusOf(sid)) }));
+  const setStatus = (sid, st) => setDraft((d) => ({ ...d, [sid]: st }));
   const allPresent = () => setDraft(Object.fromEntries(students.map((s) => [s._id, 'P'])));
 
   const doSave = async (editReason) => {
@@ -177,18 +177,18 @@ export default function MarkAttendance() {
       )}
       {firstSave && !closed && <p className="mb-3 text-[15px] text-muted">{t('mark.hint')}</p>}
 
-      <div className="grid grid-cols-3 gap-2 sm:grid-cols-4 md:grid-cols-6">
-        {roster.isLoading && Array.from({ length: 12 }, (_, i) => <Skeleton key={i} className="h-[84px]" />)}
+      {roster.isLoading && <div className="space-y-1">{Array.from({ length: 10 }, (_, i) => <Skeleton key={i} className="h-16" />)}</div>}
+      <ul className="divide-y divide-line/70 overflow-hidden rounded-2xl border border-line bg-card lg:grid lg:grid-cols-2 lg:divide-y-0 lg:[&>li]:border-b lg:[&>li]:border-b-line/70">
         {students.map((s) => {
           const isDraft = draft[s._id] !== undefined && draft[s._id] !== (saved[s._id] ?? 'P');
           return (
-            <StudentTile key={s._id} student={s} status={statusOf(s._id)} disabled={Boolean(closed)}
+            <StudentRow key={s._id} student={s} status={statusOf(s._id)} disabled={Boolean(closed)}
               sync={isDraft ? 'draft' : syncOf[s._id] || null}
               note={noteOf[s._id]}
-              onTap={() => tap(s._id)} onHold={() => setAuditFor(s)} />
+              onChange={(st) => setStatus(s._id, st)} onHold={() => setAuditFor(s)} />
           );
         })}
-      </div>
+      </ul>
       {!firstSave && students.length > 0 && <p className="mt-3 text-center text-sm text-muted">{t('mark.holdHint')}</p>}
 
       {/* live counter + save */}
@@ -246,7 +246,7 @@ function Shell({ back, title, historyTo, children }) {
           )}
         </div>
       </header>
-      <main className="mx-auto max-w-3xl px-4 pt-4">{children}</main>
+      <main className="mx-auto max-w-3xl px-3 pt-4 sm:px-4">{children}</main>
     </div>
   );
 }

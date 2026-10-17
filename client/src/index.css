@@ -23,6 +23,8 @@
   --color-absent-strong: #c2362b;/* solid red fills that carry white text */
   --color-accent: #d0ff00;       /* lime: pills, highlights, the active nav item */
   --color-on-brand: #101414;     /* ink on teal/lime, the same in both themes */
+  --color-on-present: #ffffff;   /* text on a solid present / leave fill */
+  --color-on-leave: #ffffff;
 
   --font-sans: 'Baloo Tamma 2 Variable', 'Baloo 2 Variable', 'Noto Sans Kannada', system-ui, sans-serif;
 
@@ -64,6 +66,8 @@
     --color-slate: #00a9b4;
     --color-board-text: #3fd8e2;
     --color-absent-strong: #b5382d;
+    --color-on-present: #101414;
+    --color-on-leave: #101414;
   }
 }
 :root[data-theme='dark'] {
@@ -83,6 +87,8 @@
   --color-slate: #00a9b4;
   --color-board-text: #3fd8e2;
   --color-absent-strong: #b5382d;
+  --color-on-present: #101414;
+  --color-on-leave: #101414;
 }
 
 /* Teal panels (headers, class slates): flat brand teal with a soft highlight, ink text. */

@@ -45,7 +45,7 @@ npm run demo        # builds the app with its offline service worker, then serve
 ```
 
 Open **http://localhost:4173**, log in as the teacher, open 4-A once (this saves the class on the device),
-then turn off Wi-Fi (or Chrome DevTools > Network > Offline) and mark the class. The tiles show a cloud icon:
+then turn off Wi-Fi (or Chrome DevTools > Network > Offline) and mark the class. Each row shows a cloud icon:
 saved on the device. Turn the network back on and the icons turn into ticks within a few seconds.
 
 `npm run dev` also marks offline once a page is open, but only `npm run demo` (or a real deployment) can
@@ -123,7 +123,7 @@ client/                 React + Vite + Tailwind
 | --- | --- |
 | #1 Server overload at 9 a.m., marks lost | Marks are saved on the phone first (IndexedDB) and sent in the background. One request per class. |
 | #2 Poor network, data packs | Works fully offline; the class list is downloaded when the teacher opens the home screen. |
-| #3 Hard for older teachers | Everyone starts present; tap only the absentees. Big tiles with roll numbers. |
+| #3 Hard for older teachers | Everyone starts present; tap only the absentees. One row per child with big P / A / L / Lv buttons (the paper register's letters), so every status is one tap and the current one is always visible. |
 | #5 Rigid marking windows | Late marking is allowed. Changing saved marks after the window asks for a reason, which is logged. |
 | #6 Time lost every class | 40 children: 3 absentees = 4 taps including Save. |
 | Duplicate or lost records on retry | Every mark carries a phone-generated id; the server ignores ids it has seen and rejects older overwrites. |
@@ -138,13 +138,13 @@ and `server/src/services/attendance.js` (`saveBulk`).
 
 | Research issue | How Phase 3 handles it |
 | --- | --- |
-| #8 Parents told late; reasons lost in calls and notes | An absence alert reaches the parent within about 2 minutes. They answer Sick, Family, Travelling or Other with one tap, even from the notification itself, and the reason appears on the teacher's tile. |
+| #8 Parents told late; reasons lost in calls and notes | An absence alert reaches the parent within about 2 minutes. They answer Sick, Family, Travelling or Other with one tap, even from the notification itself, and the reason appears next to the child's name on the teacher's register. |
 | #9 Pickup safety for small children | Pre-primary arrival and hand-over board. Parents keep a list of who may collect the child, with optional photos. The teacher hands over by photo, or by scanning the parent's QR pass for the day, which names the person. The parent is told who collected the child and when. Children still waiting after pickup time alert the class teacher and office. |
 | #15 Pre-primary needs | LKG–UKG classes open the pickup board instead of the register. |
 | Leave | Parents apply in the app; the class teacher approves; the days are marked as leave automatically and do not count as an unexplained absence. |
 
 **Gate check (passed):** teacher marked Riya absent; her parent was alerted 147 seconds later (target: under 5 minutes),
-tapped "Sick", and the reason showed on the teacher's tile. Pickup: the parent's QR pass was scanned through a camera
+tapped "Sick", and the reason showed next to her name on the teacher's register. Pickup: the parent's QR pass was scanned through a camera
 feed, the child was handed to the grandfather named on it, and the parent was told in Kannada.
 
 How it works:

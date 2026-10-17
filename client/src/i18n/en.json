@@ -241,7 +241,7 @@
     "today": "Today",
     "day": "Day",
     "period": "Period {{n}}",
-    "hint": "Everyone starts as present. Tap a child to mark absent; tap again for late, then leave.",
+    "hint": "Everyone starts as present (P). Tap A for absent, L for late, Lv for leave.",
     "save": "Save attendance",
     "saveChanges": "Save {{count}} changes",
     "saveChanges_one": "Save 1 change",
@@ -265,7 +265,7 @@
     "history": "Past days",
     "changes": "Changes for {{name}}",
     "noChanges": "No changes. Marked once.",
-    "holdHint": "Press and hold a child to see who changed the mark.",
+    "holdHint": "Press and hold a name to see who changed the mark.",
     "by": "{{from}} → {{to}} by {{name}}",
     "offlineRoster": "No internet. Using the class list saved on this phone.",
     "noRoster": "This class has not been opened on this phone yet. Connect to the internet once to download it.",
@@ -442,5 +442,11 @@
     "theme_dark": "Dark",
     "dataSaver": "Save mobile data",
     "dataSaverHint": "Lists stop refreshing on their own. Attendance still saves and sends as usual."
+  },
+  "statusShort": {
+    "P": "P",
+    "A": "A",
+    "L": "L",
+    "LV": "Lv"
   }
 }
